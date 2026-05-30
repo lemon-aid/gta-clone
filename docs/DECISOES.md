@@ -152,3 +152,36 @@ posição errada → atravessava a calçada. Os campos `path`/`lane` existiam ma
 
 **Validado:** carro deslocado p/ calçada (y=10) volta à pista (y=6) em 1 frame; todos os 6 NPCs
 na estrada após 300 frames; carro estacionado não se move.
+
+---
+
+## 2026-05-30 — Menu unificado, inventário, party, procurado
+
+Substituído o menu/inventário mockado (não funcionava) por um sistema completo.
+
+**Menu overlay (`#menu`)** com 4 abas, aberto pela engrenagem ou tecla **M** (Esc fecha):
+- **Inventário** — lista itens com ícone, qtd e botão "Usar". Remédios (heal>0) curam HP.
+  Itens começam com 2 Refrigerantes + 1 Kit Médico. Compras nas lojas agora vão para o
+  inventário (antes curavam na hora).
+- **Missões** — lista TODAS as quests com badge de status (Concluída/Ativa/Bloqueada) e
+  filtro (Todas/Ativas/Concluídas). Status derivado de `questIndex`.
+- **Procurado** — mostra 0–5 estrelas + descrição do nível.
+- **Party** — 4 membros (Nico/boy, Mia/girl, Luna/hacker, Theo/skate) com retrato, barra de HP
+  e botão Ativar. Salvar/Carregar/Fechar no rodapé.
+
+**Sistema de Party:** `PARTY[]` + `activeMember`. O personagem ativo é quem anda no mapa
+(sprite via `activeChar().kind`). HP do ativo vive em `player.hp`; ao trocar, o HP é guardado
+no membro e o do novo é carregado. Troca rápida pelas **teclas 1–4** ou botão Ativar.
+
+**Sistema de Procurado (novo):** `player.wanted` 0–5.
+- Ganha: entrar num carro em patrulha = roubo → +1 (carro estacionado pelo jogador não conta).
+- Decai: 1 estrela a cada 18s a pé sem crimes.
+- HUD e aba Procurado refletem o nível.
+
+**Save/Load:** agora persiste inventory, HP de cada membro da party e activeMember.
+
+**Removido:** painéis `#inventory` (inventário rápido mockado) e `#menuPanel`.
+
+**Validado:** trocar p/ Mia muda sprite; refrigerante cura +15 e decrementa qtd; roubar carro
+em patrulha dá +1 procurado e ao sair fica parked; filtros de missão funcionam; 4 abas renderizam.
+Zero erros no console.

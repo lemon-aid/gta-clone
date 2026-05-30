@@ -71,6 +71,33 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
 #shopFooter{display:flex;align-items:center;justify-content:space-between}
 #shopMoney{color:#67eb62;font-weight:900;font-size:20px}
 #shopClose{padding:10px 22px;border-radius:8px;border:2px solid #ff5dbf;background:#3a1230;color:#fff;font-weight:900;cursor:pointer}
+#menu{position:fixed;inset:0;z-index:16;display:flex;align-items:center;justify-content:center;background:rgba(8,6,24,.86);pointer-events:auto}
+#menuBox{position:relative;left:auto;top:auto;width:min(780px,calc(100vw - 40px));max-height:calc(100vh - 60px);padding:18px 20px;display:flex;flex-direction:column}
+#menuTabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+#menuTabs button{flex:1;min-width:110px;padding:10px;border-radius:10px;border:2px solid #3cdeff;background:#0d143d;color:#fff;font-weight:900;cursor:pointer}
+#menuTabs button.active{background:#1b2a6b;border-color:#ff5dbf;color:#ffd33f}
+#menuBody{flex:1;overflow-y:auto;min-height:240px;padding-right:6px}
+#menuFooter{display:flex;gap:10px;margin-top:14px;justify-content:flex-end}
+#menuFooter button{padding:10px 18px;border-radius:8px;border:2px solid #3cdeff;background:#0d143d;color:#fff;font-weight:900;cursor:pointer}
+#menuCloseBtn{border-color:#ff5dbf;background:#3a1230}
+.menuTitle{font-size:20px;font-weight:900;color:#ffd33f;margin-bottom:12px}
+.invItem,.partyItem,.questItem{display:flex;align-items:center;gap:14px;background:#0d143d;border:2px solid #3cdeff;border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.invItem .icon{flex:0 0 auto;width:40px;height:40px}
+.partyItem .portrait{flex:0 0 auto;width:72px;height:72px;border-radius:8px;background:#091132 no-repeat}
+.itemMain{flex:1;min-width:0}
+.itemMain .nm{font-weight:900;font-size:16px}
+.itemMain .sub{font-size:12px;color:#9edfff}
+.menuBtn{padding:8px 14px;border-radius:8px;border:2px solid #67eb62;background:#123a1c;color:#fff;font-weight:900;cursor:pointer;white-space:nowrap}
+.menuBtn:disabled{opacity:.4;cursor:not-allowed;border-color:#556}
+.menuBtn.active{border-color:#ffd33f;background:#3a3210}
+.badge{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:900}
+.badge.done{background:#123a1c;color:#67eb62;border:1px solid #67eb62}
+.badge.active{background:#3a3210;color:#ffd33f;border:1px solid #ffd33f}
+.badge.locked{background:#2a2746;color:#9aabbb;border:1px solid #556}
+.filterRow{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.hpbar{height:8px;border-radius:5px;background:#2a2746;overflow:hidden;margin-top:6px}
+.hpbar>span{display:block;height:100%;background:#67eb62}
+.wantedBig{display:flex;gap:10px;margin:10px 0 16px}
 @media (max-width:800px){
   #mission{left:18px;top:122px;width:calc(100vw - 36px)}
   #inventory{right:18px;top:auto;bottom:190px}
@@ -97,15 +124,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
     <div class="mission-ok">✓ Rota calculada</div>
   </div>
   <div id="minimap"><canvas id="miniCanvas" width="154" height="154"></canvas></div>
-  <div id="inventory" class="panel">
-    <div class="inv-title">Inventario Rapido</div>
-    <div class="inv-grid" id="invGrid"></div>
-  </div>
-  <div id="menuPanel" class="panel">
-    <button id="inventoryMenuBtn">Inventário</button>
-    <button id="saveBtn">Salvar Jogo</button>
-    <button id="loadBtn">Carregar Jogo</button>
-  </div>
   <div id="radio" class="panel">
     <div class="radio-title">♫ Radio Los Santos</div>
     <div class="radio-sub">Synthwave 88.3 FM</div>
@@ -138,6 +156,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
         <span id="shopMoney"></span>
         <button id="shopClose">Sair</button>
       </div>
+    </div>
+  </div>
+</div>
+<div id="menu" class="hidden">
+  <div id="menuBox" class="panel">
+    <div id="menuTabs"></div>
+    <div id="menuBody"></div>
+    <div id="menuFooter">
+      <button id="menuSave">Salvar</button>
+      <button id="menuLoad">Carregar</button>
+      <button id="menuCloseBtn">Fechar</button>
     </div>
   </div>
 </div>
@@ -174,7 +203,13 @@ function dirRow(d){return {down:0,left:1,right:2,up:3}[d]||0}
 
 const Keys={};
 let debugColliders=false;
-addEventListener('keydown',e=>{Keys[e.code]=true;if(e.code==='KeyC'&&!e.repeat)debugColliders=!debugColliders;if(e.code==='Escape'&&shopOpen)closeShop();if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault()});
+addEventListener('keydown',e=>{Keys[e.code]=true;
+  if(e.code==='KeyC'&&!e.repeat)debugColliders=!debugColliders;
+  if(e.code==='Escape'){if(menuOpen)closeMenu();else if(shopOpen)closeShop()}
+  if(e.code==='KeyM'&&!e.repeat&&!shopOpen)menuOpen?closeMenu():openMenu();
+  if(/^Digit[1-4]$/.test(e.code)&&!e.repeat)switchMember(parseInt(e.code.slice(5),10)-1);
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
+});
 addEventListener('keyup',e=>{Keys[e.code]=false});
 
 const map={road:new Set(),lanes:new Map(),buildings:[],props:[],overlays:[],parks:new Set(),parking:[]};
@@ -249,7 +284,22 @@ const npcs=[
   {kind:'girl',x:12,y:12,dir:'down',name:'Claudia',lines:['Adoro essa praca.','A fonte fica linda de noite.']},
   {kind:'magician',x:5,y:23,dir:'up',name:'Vince',lines:['A noite e jovem na Nolan City.','Aproveita o passeio, parceiro!']}
 ];
-const player={x:13.5,y:4.7,w:.42,h:.64,dir:'down',speed:3.4,anim:0,inCar:null,hp:100,cash:2000,wanted:3};
+const player={x:13.5,y:4.7,w:.42,h:.64,dir:'down',speed:3.4,anim:0,inCar:null,hp:100,cash:2000,wanted:0};
+
+// Party: ate 4 personagens; o ativo e quem anda no mapa. HP do ativo vive em player.hp.
+const PARTY=[
+  {name:'Nico',kind:'boy',hp:100},
+  {name:'Mia',kind:'girl',hp:100},
+  {name:'Luna',kind:'hacker',hp:100},
+  {name:'Theo',kind:'skate',hp:100}
+];
+let activeMember=0;
+function activeChar(){return PARTY[activeMember]}
+// Inventario (comeca com alguns remedios)
+let inventory=[
+  {key:'Refrigerante',label:'Refrigerante',icon:4,heal:15,qty:2},
+  {key:'Kit Medico',label:'Kit Medico',icon:1,heal:100,qty:1}
+];
 
 const SHOPS={
   store:{title:'Mercado Nolan',keeper:'girl',name:'Sara',greet:'Bem-vindo ao Mercado Nolan! Temos de tudo um pouco.',items:[
@@ -283,6 +333,8 @@ const QUESTS=[
 ];
 let questIndex=0;
 let shopOpen=false,activeShop=null;
+let menuOpen=false,menuTab='inv',questFilter='todas';
+let wantedTimer=0;
 const cam={x:0,y:0};
 const touch={x:0,y:0,active:false,a:false,b:false,xbtn:false};
 let running=false,last=0,toastTimer=0,prompt=false,activeDialog=null;
@@ -292,8 +344,6 @@ function setupUI(){
   uiBg(document.getElementById('moneyIcon'),ASSETS.ui.hud,3,36);
   const stars=document.getElementById('stars');stars.innerHTML='';
   for(let i=0;i<5;i++){const s=document.createElement('span');s.className='sprite';uiBg(s,ASSETS.ui.hud,i<player.wanted?1:2,28);stars.appendChild(s)}
-  const grid=document.getElementById('invGrid');grid.innerHTML='';
-  [0,1,7,13,4,15].forEach((idx,i)=>{const slot=document.createElement('div');slot.className='slot';const fr=document.createElement('span');fr.className='sprite';uiBg(fr,ASSETS.ui.panels,i===0?1:0,44);const it=document.createElement('span');it.className='sprite item';uiBg(it,ASSETS.ui.inv,idx,32);slot.append(fr,it);grid.appendChild(slot)});
   uiBg(document.getElementById('joyBase'),ASSETS.ui.touch,0,132);
   uiBg(document.getElementById('knob'),ASSETS.ui.touch,1,64);
   uiBg(document.getElementById('btnX'),ASSETS.ui.touch,8,66);
@@ -302,15 +352,10 @@ function setupUI(){
   uiBg(document.getElementById('btnB'),ASSETS.ui.touch,7,66);
   uiBg(document.getElementById('pauseBtn'),ASSETS.ui.touch,10,52);
   uiBg(document.getElementById('settingsBtn'),ASSETS.ui.touch,15,52);
-  const menu=document.getElementById('menuPanel');
-  const invPanel=document.getElementById('inventory');
-  document.getElementById('settingsBtn').onclick=()=>{menu.style.display=menu.style.display==='block'?'none':'block'};
-  document.getElementById('inventoryMenuBtn').onclick=()=>{
-    invPanel.style.display=invPanel.style.display==='block'?'none':'block';
-    menu.style.display='none';
-  };
-  document.getElementById('saveBtn').onclick=()=>{saveGame();menu.style.display='none'};
-  document.getElementById('loadBtn').onclick=()=>{loadGame();menu.style.display='none'};
+  document.getElementById('settingsBtn').onclick=()=>{menuOpen?closeMenu():openMenu()};
+  document.getElementById('menuSave').onclick=()=>{saveGame()};
+  document.getElementById('menuLoad').onclick=()=>{loadGame();renderMenu()};
+  document.getElementById('menuCloseBtn').onclick=closeMenu;
   document.getElementById('shopClose').onclick=closeShop;
   updateHUD();renderQuest();
 }
@@ -457,20 +502,124 @@ function renderShopItems(){
 function buyItem(it){
   if(player.cash<it.price){showToast('Dinheiro insuficiente');return}
   player.cash-=it.price;
-  if(it.hp)player.hp=Math.min(100,player.hp+it.hp);
+  const ic=it.hp>=100?1:it.hp>=40?3:it.hp>0?4:0; // icone pelo poder de cura
+  addItem({key:it.label,label:it.label,icon:ic,heal:it.hp||0}); // vai para o inventario
   updateHUD();renderShopItems();
   showToast(it.buyMsg||('Comprou '+it.label));
   questEvent('shop_buy');
 }
 function closeShop(){shopOpen=false;activeShop=null;document.getElementById('shop').classList.add('hidden')}
 
+// ===== Party =====
+function switchMember(i){
+  if(i<0||i>=PARTY.length||i===activeMember)return;
+  PARTY[activeMember].hp=player.hp;      // guarda o HP atual no membro que estava ativo
+  activeMember=i;
+  player.hp=PARTY[activeMember].hp;       // carrega o HP do novo ativo
+  updateHUD();renderMenu();
+  showToast('Controlando '+PARTY[i].name);
+}
+
+// ===== Inventario =====
+function addItem(it){
+  const ex=inventory.find(o=>o.key===it.key);
+  if(ex)ex.qty++;else inventory.push({key:it.key,label:it.label,icon:it.icon,heal:it.heal||0,qty:1});
+}
+function useItem(idx){
+  const it=inventory[idx];if(!it)return;
+  if(!it.heal){showToast(it.label+': item sem uso');return}
+  if(player.hp>=100){showToast('Vida ja esta cheia');return}
+  player.hp=Math.min(100,player.hp+it.heal);
+  showToast('Usou '+it.label+' (+'+it.heal+' HP)');
+  it.qty--;if(it.qty<=0)inventory.splice(idx,1);
+  updateHUD();renderMenu();
+}
+
+// ===== Menu (overlay com abas) =====
+function openMenu(){menuOpen=true;document.getElementById('menu').classList.remove('hidden');renderMenu()}
+function closeMenu(){menuOpen=false;document.getElementById('menu').classList.add('hidden')}
+function setKindPortrait(el,kind){
+  const src=ASSETS.people[kind]||ASSETS.people.boy,scale=72/64;
+  el.style.backgroundImage=`url("${cb(src)}")`;
+  el.style.backgroundSize=`${256*scale}px ${256*scale}px`;
+  el.style.backgroundPosition='0px 0px';
+}
+function renderMenu(){
+  if(!menuOpen)return;
+  const tabs=[['inv','Inventário'],['quests','Missões'],['wanted','Procurado'],['party','Party']];
+  const nav=document.getElementById('menuTabs');nav.innerHTML='';
+  tabs.forEach(([k,lbl])=>{const b=document.createElement('button');b.textContent=lbl;if(k===menuTab)b.className='active';b.onclick=()=>{menuTab=k;renderMenu()};nav.appendChild(b)});
+  const body=document.getElementById('menuBody');body.innerHTML='';
+  ({inv:renderInvBody,quests:renderQuestBody,wanted:renderWantedBody,party:renderPartyBody}[menuTab]||renderInvBody)(body);
+}
+function menuTitle(body,txt){const t=document.createElement('div');t.className='menuTitle';t.textContent=txt;body.appendChild(t)}
+function renderInvBody(body){
+  menuTitle(body,'Inventário');
+  if(!inventory.length){const e=document.createElement('div');e.style.color='#9edfff';e.textContent='Inventário vazio. Compre itens nas lojas.';body.appendChild(e);return}
+  inventory.forEach((it,i)=>{
+    const row=document.createElement('div');row.className='invItem';
+    const ic=document.createElement('span');ic.className='icon sprite';uiBg(ic,ASSETS.ui.inv,it.icon,40);
+    const main=document.createElement('div');main.className='itemMain';
+    main.innerHTML=`<div class="nm">${it.label} ×${it.qty}</div><div class="sub">${it.heal?('Remédio · +'+it.heal+' HP'):'Item'}</div>`;
+    const btn=document.createElement('button');btn.className='menuBtn';btn.textContent='Usar';btn.disabled=!it.heal;btn.onclick=()=>useItem(i);
+    row.append(ic,main,btn);body.appendChild(row);
+  });
+}
+function renderQuestBody(body){
+  menuTitle(body,'Missões');
+  const fr=document.createElement('div');fr.className='filterRow';
+  [['todas','Todas'],['ativas','Ativas'],['concluidas','Concluídas']].forEach(([k,lbl])=>{const b=document.createElement('button');b.className='menuBtn'+(questFilter===k?' active':'');b.textContent=lbl;b.onclick=()=>{questFilter=k;renderMenu()};fr.appendChild(b)});
+  body.appendChild(fr);
+  let shown=0;
+  QUESTS.forEach((q,i)=>{
+    const status=i<questIndex?'concluida':i===questIndex?'ativa':'bloqueada';
+    if(questFilter==='ativas'&&status!=='ativa')return;
+    if(questFilter==='concluidas'&&status!=='concluida')return;
+    shown++;
+    const row=document.createElement('div');row.className='questItem';
+    const main=document.createElement('div');main.className='itemMain';
+    main.innerHTML=`<div class="nm">${q.title}</div><div class="sub">${q.desc} · Recompensa $${q.reward}</div>`;
+    const badge=document.createElement('span');
+    badge.className='badge '+(status==='concluida'?'done':status==='ativa'?'active':'locked');
+    badge.textContent=status==='concluida'?'Concluída':status==='ativa'?'Ativa':'Bloqueada';
+    row.append(main,badge);body.appendChild(row);
+  });
+  if(!shown){const e=document.createElement('div');e.style.color='#9edfff';e.textContent='Nenhuma missão neste filtro.';body.appendChild(e)}
+}
+function renderWantedBody(body){
+  menuTitle(body,'Nível de Procurado');
+  const row=document.createElement('div');row.className='wantedBig';
+  for(let i=0;i<5;i++){const s=document.createElement('span');s.className='sprite';uiBg(s,ASSETS.ui.hud,i<player.wanted?1:2,40);row.appendChild(s)}
+  body.appendChild(row);
+  const desc=['Você está limpo. A polícia te ignora.','Suspeito. Um patrulheiro pode te observar.','Procurado. A polícia está de olho em você.','Perigoso. Viaturas vão te perseguir.','Foragido. Reforço pesado a caminho.','Inimigo público #1. A cidade inteira te caça!'][player.wanted]||'';
+  const txt=document.createElement('div');txt.style.cssText='color:#dfe6ff;line-height:1.5';
+  txt.innerHTML=`<b>${player.wanted}/5 estrelas</b><br>${desc}<br><br><span style="color:#9edfff">Roubar carros em movimento aumenta o nível. Fique a pé e sem crimes por um tempo para a polícia perder o seu rastro.</span>`;
+  body.appendChild(txt);
+}
+function renderPartyBody(body){
+  menuTitle(body,'Sua Party');
+  PARTY.forEach((m,i)=>{
+    const hp=(i===activeMember)?player.hp:m.hp;
+    const row=document.createElement('div');row.className='partyItem';
+    const p=document.createElement('div');p.className='portrait sprite';setKindPortrait(p,m.kind);
+    const main=document.createElement('div');main.className='itemMain';
+    main.innerHTML=`<div class="nm">${m.name} ${i===activeMember?'<span class="badge active">Ativo</span>':''}</div><div class="sub">HP ${Math.round(hp)}/100</div><div class="hpbar"><span style="width:${Math.max(0,Math.min(100,hp))}%"></span></div>`;
+    const btn=document.createElement('button');btn.className='menuBtn'+(i===activeMember?' active':'');btn.textContent=i===activeMember?'Ativo':'Ativar';btn.disabled=i===activeMember;btn.onclick=()=>switchMember(i);
+    row.append(p,main,btn);body.appendChild(row);
+  });
+  const hint=document.createElement('div');hint.style.cssText='color:#9edfff;margin-top:8px';hint.textContent='Dica: teclas 1–4 trocam o personagem ativo rapidamente.';
+  body.appendChild(hint);
+}
+
 // ---- Save / Load ----
 const SAVE_KEY='nolan_city_save_v1';
 function saveGame(){
+  PARTY[activeMember].hp=player.hp; // sincroniza HP do ativo antes de salvar
   const data={
     player:{x:player.x,y:player.y,hp:player.hp,cash:player.cash,wanted:player.wanted,dir:player.dir,inCar:player.inCar?cars.indexOf(player.inCar):-1},
     cars:cars.map(c=>({x:c.x,y:c.y,dir:c.dir,vx:c.vx||0,vy:c.vy||0,parked:!!c.parked})),
     questIndex,questProg:(currentQuest()&&currentQuest().goal!=null)?currentQuest().prog:0,
+    inventory,party:PARTY.map(m=>({hp:m.hp})),activeMember,
     ts:Date.now()
   };
   try{localStorage.setItem(SAVE_KEY,JSON.stringify(data));showToast('Jogo salvo!')}
@@ -486,6 +635,10 @@ function loadGame(){
     player.inCar=(d.player.inCar>=0)?cars[d.player.inCar]:null;
     questIndex=d.questIndex||0;
     if(currentQuest()&&currentQuest().goal!=null)currentQuest().prog=d.questProg||0;
+    if(Array.isArray(d.inventory))inventory=d.inventory;
+    if(Array.isArray(d.party))d.party.forEach((m,i)=>{if(PARTY[i])PARTY[i].hp=m.hp});
+    if(typeof d.activeMember==='number')activeMember=d.activeMember;
+    player.hp=PARTY[activeMember].hp;
     closeShop();closeNpcDialog();
     updateHUD();renderQuest();
     showToast('Jogo carregado!');
@@ -547,7 +700,9 @@ function update(dt){
   const actionDown=Keys.KeyE||touch.a;
   let actionConsumed=false;
   if(activeDialog&&actionDown&&!player._e){advanceDialog();actionConsumed=true}
-  const blocked=activeDialog||shopOpen;
+  const blocked=activeDialog||shopOpen||menuOpen;
+  // Procurado decai com o tempo enquanto a pe e sem cometer crimes
+  if(player.wanted>0&&!player.inCar){wantedTimer+=dt;if(wantedTimer>=18){player.wanted--;wantedTimer=0;updateHUD();showToast(player.wanted>0?('Procurado reduzido — '+player.wanted+'★'):'Você despistou a polícia!')}}else{wantedTimer=0}
   let dx=0,dy=0;
   if(!blocked){
     if(Keys.KeyW||Keys.ArrowUp)dy-=1;if(Keys.KeyS||Keys.ArrowDown)dy+=1;if(Keys.KeyA||Keys.ArrowLeft)dx-=1;if(Keys.KeyD||Keys.ArrowRight)dx+=1;
@@ -595,7 +750,13 @@ function update(dt){
     if(actionDown&&!player._e&&!actionConsumed){
       if(npc)openNpcDialog(npc);
       else if(shop)openShop(shop);
-      else if(car){player.inCar=car;car.vx=0;car.vy=0;showToast('Entrou no veiculo');questEvent('drive_enter')}
+      else if(car){
+        const roubo=!car.parked; // carro em patrulha = roubo; carro que voce estacionou = seu
+        player.inCar=car;car.vx=0;car.vy=0;
+        if(roubo){player.wanted=Math.min(5,player.wanted+1);updateHUD();showToast('Carro roubado! Procurado +1')}
+        else showToast('Entrou no veiculo');
+        questEvent('drive_enter');
+      }
     }
   }
   player._e=actionDown;
@@ -717,7 +878,7 @@ function draw(){
   for(const n of npcs){drawSheet(sheet(ASSETS.people[n.kind],dirRow(n.dir),0),n.x*TILE-cam.x,n.y*TILE-cam.y)}
   if(!player.inCar){
     const col=Math.floor(player.anim)%4;
-    drawSheet(sheet(ASSETS.people.boy,dirRow(player.dir),col),player.x*TILE-cam.x-TILE/2,player.y*TILE-cam.y-TILE/2);
+    drawSheet(sheet(ASSETS.people[activeChar().kind],dirRow(player.dir),col),player.x*TILE-cam.x-TILE/2,player.y*TILE-cam.y-TILE/2);
   }
   for(const o of map.overlays)drawTrafficLight(o);
   drawBuildingColliders();
