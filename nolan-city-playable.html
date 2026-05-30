@@ -466,7 +466,7 @@ const SAVE_KEY='nolan_city_save_v1';
 function saveGame(){
   const data={
     player:{x:player.x,y:player.y,hp:player.hp,cash:player.cash,wanted:player.wanted,dir:player.dir,inCar:player.inCar?cars.indexOf(player.inCar):-1},
-    cars:cars.map(c=>({x:c.x,y:c.y,dir:c.dir,vx:c.vx||0,vy:c.vy||0})),
+    cars:cars.map(c=>({x:c.x,y:c.y,dir:c.dir,vx:c.vx||0,vy:c.vy||0,parked:!!c.parked})),
     questIndex,questProg:(currentQuest()&&currentQuest().goal!=null)?currentQuest().prog:0,
     ts:Date.now()
   };
@@ -479,7 +479,7 @@ function loadGame(){
   try{
     const d=JSON.parse(raw);
     Object.assign(player,{x:d.player.x,y:d.player.y,hp:d.player.hp,cash:d.player.cash,wanted:d.player.wanted,dir:d.player.dir});
-    (d.cars||[]).forEach((cd,i)=>{if(cars[i]){cars[i].x=cd.x;cars[i].y=cd.y;cars[i].dir=cd.dir;cars[i].vx=cd.vx;cars[i].vy=cd.vy}});
+    (d.cars||[]).forEach((cd,i)=>{if(cars[i]){cars[i].x=cd.x;cars[i].y=cd.y;cars[i].dir=cd.dir;cars[i].vx=cd.vx;cars[i].vy=cd.vy;cars[i].parked=!!cd.parked}});
     player.inCar=(d.player.inCar>=0)?cars[d.player.inCar]:null;
     questIndex=d.questIndex||0;
     if(currentQuest()&&currentQuest().goal!=null)currentQuest().prog=d.questProg||0;
@@ -530,8 +530,11 @@ function showToast(t){const el=document.getElementById('toast');el.textContent=t
 function update(dt){
   if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)document.getElementById('toast').style.display='none'}
   for(const c of cars){
-    if(c===player.inCar)continue; // o carro do jogador e controlado a parte (pode ir na contramao)
-    // NPCs andam sempre na mao da sua via (dir fixa correta) e sobre vias continuas -> nunca saem da estrada nem vao na contramao
+    if(c===player.inCar||c.parked)continue; // o carro do jogador (controlado) e carros estacionados pelo jogador nao patrulham
+    // Trava o carro na sua pista: 'h' fixa a linha (c.lane), 'v' fixa a coluna (c.lane).
+    // Como toda lane e uma via continua, isso garante que o NPC NUNCA saia da rua,
+    // mesmo que algo o tenha deslocado. A dir ja corresponde a mao correta da via.
+    if(c.path==='h')c.y=c.lane; else if(c.path==='v')c.x=c.lane;
     const s=c.speed*dt;
     if(c.dir==='right'){c.x+=s;if(c.x>MAP_W-1)c.x=0}
     if(c.dir==='left'){c.x-=s;if(c.x<0)c.x=MAP_W-1}
@@ -570,7 +573,7 @@ function update(dt){
     const ny=c.y+c.vy*dt;if(!carBlocked(c.x,ny))c.y=ny;else c.vy=0;
     questDrive(Math.abs(c.vx*dt)+Math.abs(c.vy*dt));
     player.x=c.x;player.y=c.y;
-    if(actionDown&&!player._e&&!actionConsumed){c.vx=0;c.vy=0;player.inCar=null;player.x+=.7;showToast('Saiu do veiculo')}
+    if(actionDown&&!player._e&&!actionConsumed){c.vx=0;c.vy=0;c.parked=true;player.inCar=null;player.x+=.7;showToast('Saiu do veiculo')}
   }else if(!blocked){
     const sp=(Keys.ShiftLeft||touch.xbtn)?player.speed*1.45:player.speed;
     if(dx||dy){

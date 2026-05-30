@@ -132,3 +132,23 @@ sprite PNG mantendo o nome, incrementar `ASSET_VER`** para forçar o reload.
 
 **Validado:** as 2 sprites novas carregam (256×256, cantos com alpha=0 = transparente correto,
 centro opaco) e renderizam limpas no jogo. Zero erros no console.
+
+---
+
+## 2026-05-30 — Correção: carros NPC saindo da pista
+
+**Sintoma:** carros NPC apareciam andando fora das pistas (na calçada/quadras).
+
+**Causa raiz:** ao entrar num carro NPC, dirigir e SAIR em outro lugar, o carro ficava fora da
+sua pista original. A IA de tráfego então retomava o movimento na `dir` fixa a partir dessa
+posição errada → atravessava a calçada. Os campos `path`/`lane` existiam mas não eram usados.
+
+**Correção (2 partes):**
+1. **Trava de pista:** no loop de tráfego, `if(c.path==='h')c.y=c.lane; else if(c.path==='v')c.x=c.lane;`
+   antes de mover. Como toda lane é uma via contínua, o NPC nunca sai da rua — e qualquer carro
+   deslocado é puxado de volta à pista no frame seguinte.
+2. **Carro estacionado:** ao sair do carro, `c.parked=true`. Carros estacionados não voltam a
+   patrulhar (ficam parados onde foram deixados, sempre numa rua). `parked` persiste no save/load.
+
+**Validado:** carro deslocado p/ calçada (y=10) volta à pista (y=6) em 1 frame; todos os 6 NPCs
+na estrada após 300 frames; carro estacionado não se move.
