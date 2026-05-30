@@ -1,0 +1,145 @@
+{
+  "image": "parking_lot_tileset.png",
+  "tile_size": 64,
+  "sheet_size": [
+    256,
+    256
+  ],
+  "columns": 4,
+  "rows": 4,
+  "tiles": [
+    {
+      "index": 0,
+      "name": "asphalt_base",
+      "x": 0,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 1,
+      "name": "parking_stall_top",
+      "x": 64,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 2,
+      "name": "parking_stall_bottom",
+      "x": 128,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 3,
+      "name": "accessible_stall_top",
+      "x": 192,
+      "y": 0,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 4,
+      "name": "sidewalk_curb_top",
+      "x": 0,
+      "y": 64,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 5,
+      "name": "sidewalk_curb_bottom",
+      "x": 64,
+      "y": 64,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 6,
+      "name": "green_median",
+      "x": 128,
+      "y": 64,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 7,
+      "name": "planted_median",
+      "x": 192,
+      "y": 64,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 8,
+      "name": "curb_left",
+      "x": 0,
+      "y": 128,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 9,
+      "name": "curb_right",
+      "x": 64,
+      "y": 128,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 10,
+      "name": "driveway_vertical",
+      "x": 128,
+      "y": 128,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 11,
+      "name": "driveway_cross",
+      "x": 192,
+      "y": 128,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 12,
+      "name": "corner_top_left",
+      "x": 0,
+      "y": 192,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 13,
+      "name": "corner_top_right",
+      "x": 64,
+      "y": 192,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 14,
+      "name": "parking_symbol_overlay",
+      "x": 128,
+      "y": 192,
+      "w": 64,
+      "h": 64
+    },
+    {
+      "index": 15,
+      "name": "warning_gate",
+      "x": 192,
+      "y": 192,
+      "w": 64,
+      "h": 64
+    }
+  ],
+  "usage": {
+    "terrain_tiles": "Use as 64x64 grid tiles. Most tiles are opaque terrain and should be placed edge-to-edge.",
+    "overlay_tile": "parking_symbol_overlay can also be drawn as an overlay on asphalt or parking stall tiles.",
+    "style": "Nolan City neon top-down parking lot, matching purple sidewalks, dark asphalt, bright white markings, and green medians."
+  }
+}

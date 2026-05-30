@@ -37,3 +37,98 @@
 - Testar `gta2d.html` visualmente
 - Decidir: merge ou dois arquivos?
 - Testar interações (NPCs, veículos, missões) no nolan-city
+
+---
+
+## 2026-05-30 — Repositório no GitHub + 6 features grandes
+
+**Repositório criado:** https://github.com/lemon-aid/gta-clone (branch master).
+`nolan-city-playable.html` confirmado como **arquivo principal de desenvolvimento**.
+
+**Features implementadas (todas em nolan-city-playable.html):**
+
+1. **Dinheiro inicial = $2.000** (antes $12.840). HUD agora atualiza dinâmico via `updateHUD()`.
+
+2. **Sistema de loja (shop)** — ao chegar perto da entrada de um prédio-loja e apertar E,
+   abre overlay fullscreen com fundo gradiente + retrato do NPC vendedor + menu de itens
+   (comprar via UI). Lojas: store (Sara), cafe (Bia), mechanic (Rato), flower (Lis),
+   hospital (Dra. Ana), arcade (Zé). Itens curam HP / cosméticos. Fecha com botão Sair ou Esc.
+   - `SHOPS` define cada loja; `openShop()`/`buyItem()`/`closeShop()`.
+
+3. **Quests + conversa com NPCs** — 9 NPCs com nomes próprios (Luna, Mia, Dani, Niko, Theo,
+   Bit, Rui, Cláudia, Vince) e falas curtas multi-linha (avança com E/clique).
+   Sistema de quest sequencial: Primeiro Contato → Mãos ao Volante → Test Drive → Primeiras Compras.
+   Cada quest dá recompensa em dinheiro. `QUESTS[]`, `questEvent()`, `questDrive()`, `completeQuest()`.
+
+4. **Física de carro com freio e ré** — carro agora tem velocidade/momentum (inércia).
+   - Acelera com WASD/setas/joystick.
+   - **Freio: H (teclado) / B (controle)** — desaceleração forte.
+   - **Ré: K (teclado) / Y (controle)** — anda pra trás mantendo a frente virada.
+   - Colisão do carro com prédios/props via `carBlocked()`.
+
+5. **Save/Load** — `localStorage` chave `nolan_city_save_v1`. Botões "Salvar Jogo" e
+   "Carregar Jogo" no menu da engrenagem (settings). Salva player, carros, quest.
+
+**Validação:** testado via JS no browser — quest avança e paga recompensa, loja abre/compra/cura,
+carro acelera/freia/dá ré, save/load restaura estado. Zero erros no console.
+
+**Notas técnicas:**
+- O arquivo NÃO tem cache-busting. Ao editar, abrir com `?v=N` no fim da URL pra evitar cache.
+- Botão Y de toque agora está ligado (era inerte antes) → usado pra ré.
+- Botão B de toque (touch.b) agora usado pra freio.
+
+**Pendente / próximas ideias:**
+- Sistema de HP do carro / dano em colisão
+- Combustível?
+- NPCs andando sozinhos (IA simples)
+- Mais quests com objetivos espaciais (ir a um local)
+- Trazer combate/armas do gta2d.html
+
+---
+
+## 2026-05-30 — Regra: carros só na estrada + mão única
+
+**Regra de design definida pelo usuário:**
+- Carros (NPC e jogador) **NÃO podem andar fora da estrada**.
+- Cada rua tem uma **mão** (direção). Os NPCs sempre seguem a mão da sua via.
+- **Apenas o carro do jogador pode andar na contramão.**
+
+**Como o mapa funciona (importante p/ entender):**
+- Vias horizontais em pares: rows [5,6], [15,16], [25,26]. No par, a 1ª row é mão 'right',
+  a 2ª é 'left' (faixa de duas mãos = duas "ruas" de mão única lado a lado).
+- Vias verticais em pares: cols [8,9], [22,23], [35,36]. 1ª col 'down', 2ª col 'up'.
+- As vias são contínuas de ponta a ponta do mapa. `map.lanes` guarda a mão de cada tile.
+
+**Mudanças feitas:**
+1. `carBlocked()` agora exige que os 4 cantos do carro estejam sobre tiles de **estrada**
+   (`isRoad`). Isso prende o carro do jogador na via — não invade calçada/grama/prédio.
+   O jogador AINDA pode ir na contramão (não há checagem de direção, só de estrada).
+2. **Bug corrigido:** o loop de tráfego no topo do `update()` movia TODOS os carros (incl. o
+   do jogador) por `c.dir` sem checar estrada e com wrap-around → o carro do jogador era movido
+   2x e saía da pista. Agora `if(c===player.inCar)continue;` exclui o carro do jogador desse loop.
+3. NPCs nascem já com a `dir` correta da mão da via + vias contínuas → nunca saem da estrada
+   nem andam na contramão. (Tentei derivar a mão por `laneAt` a cada frame, mas isso fazia o
+   NPC virar nos cruzamentos — revertido.)
+
+**Validado:** carro do jogador para nas bordas da via (y=4.8/6.2 na faixa 5-6), anda na
+contramão (esquerda numa via 'right'), e os 5 NPCs seguem na estrada após 400 frames.
+
+---
+
+## 2026-05-30 — Autonomia total + cache-busting de assets
+
+**Decisão do usuário:** autonomia total no projeto GTA clone — nunca pedir permissão
+(editar, commitar, push, rodar). Registrado também na memória persistente.
+
+**Sprites atualizados:** o usuário corrigiu a transparência de 2 sprites (mesmos nomes de arquivo):
+- `assets/imagegen/cars/black_blue_police_cruiser_imagegen.png` (polícia)
+- `assets/imagegen/cars/white_cyan_ambulance_van_imagegen.png` (ambulância)
+
+Como os nomes não mudaram, o navegador servia a versão antiga em cache.
+
+**Solução — cache-busting de assets:** adicionado `const ASSET_VER` + função `cb(src)` que anexa
+`?v=N`. Aplicado em `loadImage`, `uiBg` e `setKeeperPortrait`. **Ao trocar/atualizar qualquer
+sprite PNG mantendo o nome, incrementar `ASSET_VER`** para forçar o reload.
+
+**Validado:** as 2 sprites novas carregam (256×256, cantos com alpha=0 = transparente correto,
+centro opaco) e renderizam limpas no jogo. Zero erros no console.

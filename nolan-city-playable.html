@@ -54,11 +54,30 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
 #start p{color:#ccd6ff;margin-bottom:24px}
 #start button{pointer-events:auto;padding:14px 28px;border-radius:10px;border:2px solid #3cdeff;background:#0d143d;color:#fff;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 0 24px rgba(60,222,255,.35)}
 .hidden{display:none!important}
+#menuPanel button{margin-bottom:8px}
+#menuPanel button:last-child{margin-bottom:0}
+#shop{position:fixed;inset:0;z-index:15;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 28%,#2a1550,#0a0820);pointer-events:auto}
+#shopInner{display:flex;align-items:flex-end;gap:24px;max-width:920px;width:calc(100% - 48px)}
+#shopKeeper{width:240px;height:240px;flex:0 0 auto;background-repeat:no-repeat;filter:drop-shadow(0 0 18px rgba(60,222,255,.4))}
+#shopPanel{position:relative;left:auto;top:auto;flex:1;padding:20px 22px;min-height:300px}
+#shopName{color:#ffd33f;font-size:24px;font-weight:900;margin-bottom:6px}
+#shopGreet{font-size:15px;color:#dfe6ff;margin-bottom:16px;line-height:1.35}
+#shopItems{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.shopItem{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0d143d;border:2px solid #3cdeff;border-radius:10px;padding:10px 14px}
+.shopItem .info{font-weight:800}
+.shopItem .desc{font-size:12px;color:#9edfff;font-weight:600}
+.shopItem button{padding:8px 16px;border-radius:8px;border:2px solid #67eb62;background:#123a1c;color:#fff;font-weight:900;cursor:pointer}
+.shopItem button:disabled{opacity:.4;cursor:not-allowed;border-color:#555}
+#shopFooter{display:flex;align-items:center;justify-content:space-between}
+#shopMoney{color:#67eb62;font-weight:900;font-size:20px}
+#shopClose{padding:10px 22px;border-radius:8px;border:2px solid #ff5dbf;background:#3a1230;color:#fff;font-weight:900;cursor:pointer}
 @media (max-width:800px){
   #mission{left:18px;top:122px;width:calc(100vw - 36px)}
   #inventory{right:18px;top:auto;bottom:190px}
   #menuPanel{right:18px}
   #radio{display:none}
+  #shopInner{flex-direction:column;align-items:center;gap:8px}
+  #shopKeeper{width:140px;height:140px}
 }
 </style>
 </head>
@@ -68,7 +87,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
   <div id="status" class="panel">
     <div class="hudline">
       <span id="heart" class="sprite"></span><span class="hp" id="hp">100</span>
-      <span id="moneyIcon" class="sprite" style="margin-left:28px"></span><span class="cash" id="cash">$12,840</span>
+      <span id="moneyIcon" class="sprite" style="margin-left:28px"></span><span class="cash" id="cash">$2,000</span>
     </div>
     <div class="stars" id="stars"></div>
   </div>
@@ -82,7 +101,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
     <div class="inv-title">Inventario Rapido</div>
     <div class="inv-grid" id="invGrid"></div>
   </div>
-  <div id="menuPanel" class="panel"><button id="inventoryMenuBtn">Inventário</button></div>
+  <div id="menuPanel" class="panel">
+    <button id="inventoryMenuBtn">Inventário</button>
+    <button id="saveBtn">Salvar Jogo</button>
+    <button id="loadBtn">Carregar Jogo</button>
+  </div>
   <div id="radio" class="panel">
     <div class="radio-title">♫ Radio Los Santos</div>
     <div class="radio-sub">Synthwave 88.3 FM</div>
@@ -104,6 +127,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
     <span class="sprite" id="settingsBtn"></span>
   </div>
 </div>
+<div id="shop" class="hidden">
+  <div id="shopInner">
+    <div id="shopKeeper"></div>
+    <div id="shopPanel" class="panel">
+      <div id="shopName"></div>
+      <div id="shopGreet"></div>
+      <div id="shopItems"></div>
+      <div id="shopFooter">
+        <span id="shopMoney"></span>
+        <button id="shopClose">Sair</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="start">
   <h1>Nolan City</h1>
   <p>Protótipo jogável top-down com sprites gerados</p>
@@ -113,6 +150,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
 const TILE=64;
 const MAP_W=44, MAP_H=32;
 const AS='assets/imagegen/';
+// Cache-busting de assets: incrementar quando trocar/atualizar um sprite (PNG com mesmo nome)
+const ASSET_VER=2;
+function cb(src){return src+(src.includes('?')?'&':'?')+'v='+ASSET_VER}
 const ASSETS={
   people:{boy:AS+'people/main_boy_imagegen.png',girl:AS+'people/main_girl_imagegen.png',hacker:AS+'people/hacker_girl_imagegen.png',courier:AS+'people/food_courier_boy_imagegen.png',magician:AS+'people/street_magician_imagegen.png',skate:AS+'people/skate_kid_imagegen.png'},
   cars:{taxi:AS+'cars/yellow_taxi_imagegen.png',blue:AS+'cars/blue_electric_compact_imagegen.png',green:AS+'cars/green_street_hatchback_imagegen.png',police:AS+'cars/black_blue_police_cruiser_imagegen.png',ambulance:AS+'cars/white_cyan_ambulance_van_imagegen.png',van:AS+'cars/purple_delivery_van_imagegen.png'},
@@ -125,16 +165,16 @@ const mini=document.getElementById('miniCanvas'),mctx=mini.getContext('2d');
 let W=innerWidth,H=innerHeight,DPR=Math.max(1,Math.min(devicePixelRatio||1,2));
 function resize(){W=innerWidth;H=innerHeight;DPR=Math.max(1,Math.min(devicePixelRatio||1,2));canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
 addEventListener('resize',resize);resize();
-function loadImage(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src})}
+function loadImage(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=cb(src)})}
 async function loadAll(){for(const group of Object.values(ASSETS)){for(const [k,src] of Object.entries(group)){img[src]=await loadImage(src)}}}
 function sheet(src,row,col,cell=TILE){return {img:img[src],sx:col*cell,sy:row*cell,sw:cell,sh:cell}}
 function drawSheet(s,x,y,w=TILE,h=TILE){ctx.drawImage(s.img,s.sx,s.sy,s.sw,s.sh,x,y,w,h)}
-function uiBg(el,src,index,size=64){el.style.backgroundImage=`url("${src}")`;el.style.backgroundSize=`${size*4}px ${size*4}px`;el.style.width=size+'px';el.style.height=size+'px';el.style.backgroundPosition=`-${(index%4)*size}px -${Math.floor(index/4)*size}px`}
+function uiBg(el,src,index,size=64){el.style.backgroundImage=`url("${cb(src)}")`;el.style.backgroundSize=`${size*4}px ${size*4}px`;el.style.width=size+'px';el.style.height=size+'px';el.style.backgroundPosition=`-${(index%4)*size}px -${Math.floor(index/4)*size}px`}
 function dirRow(d){return {down:0,left:1,right:2,up:3}[d]||0}
 
 const Keys={};
 let debugColliders=false;
-addEventListener('keydown',e=>{Keys[e.code]=true;if(e.code==='KeyC'&&!e.repeat)debugColliders=!debugColliders;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault()});
+addEventListener('keydown',e=>{Keys[e.code]=true;if(e.code==='KeyC'&&!e.repeat)debugColliders=!debugColliders;if(e.code==='Escape'&&shopOpen)closeShop();if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault()});
 addEventListener('keyup',e=>{Keys[e.code]=false});
 
 const map={road:new Set(),lanes:new Map(),buildings:[],props:[],overlays:[],parks:new Set(),parking:[]};
@@ -199,10 +239,50 @@ const cars=[
   {kind:'van',x:35,y:13,dir:'down',speed:1.3,path:'v',lane:35}
 ];
 const npcs=[
-  {kind:'hacker',x:2,y:3,dir:'down'}, {kind:'girl',x:24,y:10,dir:'left'}, {kind:'courier',x:39,y:18,dir:'right'}, {kind:'magician',x:2,y:13,dir:'down'}, {kind:'skate',x:39,y:4,dir:'left'},
-  {kind:'hacker',x:17,y:13,dir:'right'}, {kind:'courier',x:29,y:18,dir:'left'}, {kind:'girl',x:12,y:12,dir:'down'}, {kind:'magician',x:5,y:23,dir:'up'}
+  {kind:'hacker',x:2,y:3,dir:'down',name:'Luna',lines:['As cameras estao limpas por enquanto.','Se precisar abrir um portao, e so me chamar.']},
+  {kind:'girl',x:24,y:10,dir:'left',name:'Mia',lines:['Vi um carro suspeito perto do cafe.','Ele seguiu pela avenida principal, na pista da direita.']},
+  {kind:'courier',x:39,y:18,dir:'right',name:'Dani',lines:['Entrega atrasada de novo!','A cidade ta um caos hoje, hein.']},
+  {kind:'magician',x:2,y:13,dir:'down',name:'Niko',lines:['Quer ver um truque?','Chega perto e aperta E pra conversar com a galera.']},
+  {kind:'skate',x:39,y:4,dir:'left',name:'Theo',lines:['A calcada e dos pedestres, mano.','Rua e pros carros, fica esperto!']},
+  {kind:'hacker',x:17,y:13,dir:'right',name:'Bit',lines:['Trabalho com redes, sabia?','Qualquer parada digital, fala comigo.']},
+  {kind:'courier',x:29,y:18,dir:'left',name:'Rui',lines:['Cuidado com os cones na rua.','Eles bloqueiam a passagem de verdade.']},
+  {kind:'girl',x:12,y:12,dir:'down',name:'Claudia',lines:['Adoro essa praca.','A fonte fica linda de noite.']},
+  {kind:'magician',x:5,y:23,dir:'up',name:'Vince',lines:['A noite e jovem na Nolan City.','Aproveita o passeio, parceiro!']}
 ];
-const player={x:13.5,y:4.7,w:.42,h:.64,dir:'down',speed:3.4,anim:0,inCar:null,hp:100,cash:12840,wanted:3};
+const player={x:13.5,y:4.7,w:.42,h:.64,dir:'down',speed:3.4,anim:0,inCar:null,hp:100,cash:2000,wanted:3};
+
+const SHOPS={
+  store:{title:'Mercado Nolan',keeper:'girl',name:'Sara',greet:'Bem-vindo ao Mercado Nolan! Temos de tudo um pouco.',items:[
+    {label:'Refrigerante',price:40,hp:15,desc:'+15 de vida',buyMsg:'Refrigerante gelado! +15 HP'},
+    {label:'Sanduiche',price:90,hp:40,desc:'+40 de vida'},
+    {label:'Kit Medico',price:250,hp:100,desc:'Restaura toda a vida'}
+  ]},
+  cafe:{title:'Cafe Aurora',keeper:'courier',name:'Bia',greet:'Um cafezinho pra recuperar a energia?',items:[
+    {label:'Cafe Expresso',price:30,hp:20,desc:'+20 de vida'},
+    {label:'Fatia de Bolo',price:80,hp:45,desc:'+45 de vida'}
+  ]},
+  mechanic:{title:'Oficina do Rato',keeper:'magician',name:'Rato',greet:'Carro batendo? Aqui a gente resolve.',items:[
+    {label:'Reparo Rapido',price:120,hp:30,desc:'Uma geral em voce tambem',buyMsg:'Tudo nos trinques!'},
+    {label:'Turbo (cosmetico)',price:600,desc:'So pra dar status'}
+  ]},
+  flower:{title:'Floricultura Lis',keeper:'skate',name:'Lis',greet:'Flores deixam a Nolan City mais bonita!',items:[
+    {label:'Buque',price:60,desc:'Um presente colorido',buyMsg:'Que cheiro bom!'}
+  ]},
+  hospital:{title:'Hospital Central',keeper:'girl',name:'Dra. Ana',greet:'Vamos cuidar dessa saude.',items:[
+    {label:'Atendimento',price:300,hp:100,desc:'Restaura toda a vida'}
+  ]},
+  arcade:{title:'Arcade Neon',keeper:'skate',name:'Ze',greet:'Bora jogar um fliperama?',items:[
+    {label:'Ficha de Jogo',price:20,desc:'Diversao garantida',buyMsg:'Game on!'}
+  ]}
+};
+const QUESTS=[
+  {id:'talk',title:'Primeiro Contato',desc:'Converse com qualquer morador (E perto de um NPC).',reward:300,event:'talk'},
+  {id:'enter',title:'Maos ao Volante',desc:'Entre em um veiculo.',reward:300,event:'drive_enter'},
+  {id:'drive',title:'Test Drive',desc:'Dirija pela cidade.',reward:400,prog:0,goal:30,event:'drive'},
+  {id:'shop',title:'Primeiras Compras',desc:'Compre um item em qualquer loja.',reward:500,event:'shop_buy'}
+];
+let questIndex=0;
+let shopOpen=false,activeShop=null;
 const cam={x:0,y:0};
 const touch={x:0,y:0,active:false,a:false,b:false,xbtn:false};
 let running=false,last=0,toastTimer=0,prompt=false,activeDialog=null;
@@ -229,6 +309,10 @@ function setupUI(){
     invPanel.style.display=invPanel.style.display==='block'?'none':'block';
     menu.style.display='none';
   };
+  document.getElementById('saveBtn').onclick=()=>{saveGame();menu.style.display='none'};
+  document.getElementById('loadBtn').onclick=()=>{loadGame();menu.style.display='none'};
+  document.getElementById('shopClose').onclick=closeShop;
+  updateHUD();renderQuest();
 }
 
 function pointInRect(x,y,r){return x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h}
@@ -262,17 +346,147 @@ function npcAtWorld(x,y){
   }
   return null;
 }
+function npcLines(n){
+  if(n.lines&&n.lines.length)return n.lines;
+  const data=NPC_DIALOG[n.kind];
+  return data?[data.text]:['Oi! A cidade ainda esta ganhando vida.'];
+}
 function openNpcDialog(n){
-  const data=NPC_DIALOG[n.kind]||{name:'Morador',text:'Oi! A cidade ainda esta ganhando vida, mas voce ja pode conversar com NPCs por perto.'};
-  activeDialog=n;
-  document.getElementById('dialogName').textContent=data.name;
-  document.getElementById('dialogText').textContent=data.text;
+  activeDialog=n;n._line=0;
+  const lines=npcLines(n);
+  document.getElementById('dialogName').textContent=n.name||(NPC_DIALOG[n.kind]&&NPC_DIALOG[n.kind].name)||'Morador';
+  document.getElementById('dialogText').textContent=lines[0];
+  document.getElementById('dialogHint').textContent=lines.length>1?'E / clique para continuar':'E / clique para fechar';
   document.getElementById('dialogBox').style.display='block';
   document.getElementById('prompt').style.display='none';
+  questEvent('talk');
+}
+function advanceDialog(){
+  const n=activeDialog;if(!n)return;
+  const lines=npcLines(n);
+  n._line=(n._line||0)+1;
+  if(n._line>=lines.length){closeNpcDialog();return;}
+  document.getElementById('dialogText').textContent=lines[n._line];
+  document.getElementById('dialogHint').textContent=n._line<lines.length-1?'E / clique para continuar':'E / clique para fechar';
 }
 function closeNpcDialog(){
   activeDialog=null;
   document.getElementById('dialogBox').style.display='none';
+}
+
+// ---- HUD ----
+function updateHUD(){
+  document.getElementById('hp').textContent=Math.round(player.hp);
+  document.getElementById('cash').textContent='$'+player.cash.toLocaleString('en-US');
+  const stars=document.getElementById('stars');stars.innerHTML='';
+  for(let i=0;i<5;i++){const s=document.createElement('span');s.className='sprite';uiBg(s,ASSETS.ui.hud,i<player.wanted?1:2,28);stars.appendChild(s)}
+}
+
+// ---- Quests ----
+function currentQuest(){return QUESTS[questIndex]||null}
+function renderQuest(){
+  const q=currentQuest();
+  const title=document.querySelector('#mission .mission-title');
+  const copy=document.getElementById('missionCopy');
+  const ok=document.querySelector('#mission .mission-ok');
+  if(!q){title.textContent='Cidade Livre';copy.textContent='Todas as missoes concluidas. Explore a vontade!';ok.textContent='✓ Tudo certo';return}
+  title.textContent=q.title;copy.textContent=q.desc;
+  ok.textContent=(q.goal!=null)?`Progresso: ${Math.floor(q.prog||0)}/${q.goal}`:'Objetivo ativo';
+}
+function completeQuest(){
+  const q=currentQuest();if(!q)return;
+  player.cash+=q.reward;updateHUD();
+  showToast(`Missao completa! +$${q.reward}`);
+  questIndex++;renderQuest();
+}
+function questEvent(ev){
+  const q=currentQuest();if(!q||q.event!==ev||q.goal!=null)return;
+  completeQuest();
+}
+function questDrive(dist){
+  const q=currentQuest();if(!q||q.event!=='drive'||q.goal==null)return;
+  q.prog=(q.prog||0)+dist;renderQuest();
+  if(q.prog>=q.goal)completeQuest();
+}
+
+// ---- Shop ----
+function buildingEntrance(b){return {x:b.x+BUILDING_W/2,y:b.y+BUILDING_H+0.15}}
+function nearestShop(){
+  let best=null,bd=999;
+  for(const b of map.buildings){
+    if(!SHOPS[b.name])continue;
+    const e=buildingEntrance(b),d=Math.hypot(e.x-player.x,e.y-player.y);
+    if(d<bd){bd=d;best=b}
+  }
+  return (bd<1.15&&best)?best:null;
+}
+function setKeeperPortrait(kind){
+  const el=document.getElementById('shopKeeper');
+  const src=ASSETS.people[kind]||ASSETS.people.girl;
+  const scale=240/64;
+  el.style.backgroundImage=`url("${cb(src)}")`;
+  el.style.backgroundSize=`${256*scale}px ${256*scale}px`;
+  el.style.backgroundPosition='0px 0px';
+}
+function openShop(b){
+  const def=SHOPS[b.name];if(!def)return;
+  activeShop=def;shopOpen=true;
+  setKeeperPortrait(def.keeper);
+  document.getElementById('shopName').textContent=def.name+' — '+def.title;
+  document.getElementById('shopGreet').textContent=def.greet;
+  renderShopItems();
+  document.getElementById('prompt').style.display='none';
+  document.getElementById('shop').classList.remove('hidden');
+}
+function renderShopItems(){
+  const wrap=document.getElementById('shopItems');wrap.innerHTML='';
+  activeShop.items.forEach(it=>{
+    const row=document.createElement('div');row.className='shopItem';
+    const left=document.createElement('div');
+    left.innerHTML=`<div class="info">${it.label} — $${it.price}</div><div class="desc">${it.desc||''}</div>`;
+    const btn=document.createElement('button');btn.textContent='Comprar';
+    btn.disabled=player.cash<it.price;
+    btn.onclick=()=>buyItem(it);
+    row.append(left,btn);wrap.appendChild(row);
+  });
+  document.getElementById('shopMoney').textContent='Dinheiro: $'+player.cash.toLocaleString('en-US');
+}
+function buyItem(it){
+  if(player.cash<it.price){showToast('Dinheiro insuficiente');return}
+  player.cash-=it.price;
+  if(it.hp)player.hp=Math.min(100,player.hp+it.hp);
+  updateHUD();renderShopItems();
+  showToast(it.buyMsg||('Comprou '+it.label));
+  questEvent('shop_buy');
+}
+function closeShop(){shopOpen=false;activeShop=null;document.getElementById('shop').classList.add('hidden')}
+
+// ---- Save / Load ----
+const SAVE_KEY='nolan_city_save_v1';
+function saveGame(){
+  const data={
+    player:{x:player.x,y:player.y,hp:player.hp,cash:player.cash,wanted:player.wanted,dir:player.dir,inCar:player.inCar?cars.indexOf(player.inCar):-1},
+    cars:cars.map(c=>({x:c.x,y:c.y,dir:c.dir,vx:c.vx||0,vy:c.vy||0})),
+    questIndex,questProg:(currentQuest()&&currentQuest().goal!=null)?currentQuest().prog:0,
+    ts:Date.now()
+  };
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify(data));showToast('Jogo salvo!')}
+  catch(e){showToast('Erro ao salvar');console.error(e)}
+}
+function loadGame(){
+  const raw=localStorage.getItem(SAVE_KEY);
+  if(!raw){showToast('Nenhum save encontrado');return}
+  try{
+    const d=JSON.parse(raw);
+    Object.assign(player,{x:d.player.x,y:d.player.y,hp:d.player.hp,cash:d.player.cash,wanted:d.player.wanted,dir:d.player.dir});
+    (d.cars||[]).forEach((cd,i)=>{if(cars[i]){cars[i].x=cd.x;cars[i].y=cd.y;cars[i].dir=cd.dir;cars[i].vx=cd.vx;cars[i].vy=cd.vy}});
+    player.inCar=(d.player.inCar>=0)?cars[d.player.inCar]:null;
+    questIndex=d.questIndex||0;
+    if(currentQuest()&&currentQuest().goal!=null)currentQuest().prog=d.questProg||0;
+    closeShop();closeNpcDialog();
+    updateHUD();renderQuest();
+    showToast('Jogo carregado!');
+  }catch(e){showToast('Erro ao carregar');console.error(e)}
 }
 
 function solidAt(x,y){
@@ -300,10 +514,24 @@ function nearestCar(){
   for(const c of cars){const d=Math.hypot(c.x-player.x,c.y-player.y);if(d<bd){bd=d;best=c}}
   return bd<1.15?best:null;
 }
+// Carro so pode ocupar tiles de estrada. Como toda calcada/predio/grama nao e
+// estrada, basta exigir que os 4 cantos do carro estejam sobre tiles de rua.
+function carBlocked(x,y){
+  const cx=x+0.5,cy=y+0.5,r=0.30;
+  const pts=[[cx-r,cy-r],[cx+r,cy-r],[cx-r,cy+r],[cx+r,cy+r]];
+  for(const [px,py] of pts){
+    const tx=Math.floor(px),ty=Math.floor(py);
+    if(tx<0||ty<0||tx>=MAP_W||ty>=MAP_H)return true;
+    if(!isRoad(tx,ty))return true;
+  }
+  return false;
+}
 function showToast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';toastTimer=1.4}
 function update(dt){
   if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)document.getElementById('toast').style.display='none'}
   for(const c of cars){
+    if(c===player.inCar)continue; // o carro do jogador e controlado a parte (pode ir na contramao)
+    // NPCs andam sempre na mao da sua via (dir fixa correta) e sobre vias continuas -> nunca saem da estrada nem vao na contramao
     const s=c.speed*dt;
     if(c.dir==='right'){c.x+=s;if(c.x>MAP_W-1)c.x=0}
     if(c.dir==='left'){c.x-=s;if(c.x<0)c.x=MAP_W-1}
@@ -312,21 +540,38 @@ function update(dt){
   }
   const actionDown=Keys.KeyE||touch.a;
   let actionConsumed=false;
-  if(activeDialog&&actionDown&&!player._e){closeNpcDialog();actionConsumed=true}
+  if(activeDialog&&actionDown&&!player._e){advanceDialog();actionConsumed=true}
+  const blocked=activeDialog||shopOpen;
   let dx=0,dy=0;
-  if(!activeDialog){
+  if(!blocked){
     if(Keys.KeyW||Keys.ArrowUp)dy-=1;if(Keys.KeyS||Keys.ArrowDown)dy+=1;if(Keys.KeyA||Keys.ArrowLeft)dx-=1;if(Keys.KeyD||Keys.ArrowRight)dx+=1;
     if(touch.active){dx+=touch.x;dy+=touch.y}
   }
   const len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;
+  prompt=false;
   if(player.inCar){
     const c=player.inCar;
-    const accel=5.5*dt;
-    if(Math.abs(dx)>Math.abs(dy)){c.dir=dx>=0?'right':'left';c.x+=dx*accel}
-    else if(Math.abs(dy)>0){c.dir=dy>=0?'down':'up';c.y+=dy*accel}
+    if(c.vx===undefined){c.vx=0;c.vy=0}
+    const ACCEL=18,MAXSPD=9,FRICTION=0.6,BRAKE_F=6,REV_ACCEL=11;
+    const braking=Keys.KeyH||touch.b;
+    const reversing=Keys.KeyK||touch.ybtn;
+    if(!blocked&&(dx||dy)){
+      c.vx+=dx*ACCEL*dt;c.vy+=dy*ACCEL*dt;
+      if(Math.abs(dx)>Math.abs(dy))c.dir=dx>0?'right':'left';else c.dir=dy>0?'down':'up';
+    }
+    if(!blocked&&reversing){
+      const dv={right:[1,0],left:[-1,0],down:[0,1],up:[0,-1]}[c.dir]||[0,1];
+      c.vx-=dv[0]*REV_ACCEL*dt;c.vy-=dv[1]*REV_ACCEL*dt;
+    }
+    c.vx-=c.vx*FRICTION*dt;c.vy-=c.vy*FRICTION*dt;
+    if(!blocked&&braking){c.vx-=c.vx*BRAKE_F*dt;c.vy-=c.vy*BRAKE_F*dt;if(Math.hypot(c.vx,c.vy)<0.05){c.vx=0;c.vy=0}}
+    const sp=Math.hypot(c.vx,c.vy);if(sp>MAXSPD){c.vx*=MAXSPD/sp;c.vy*=MAXSPD/sp}
+    const nx=c.x+c.vx*dt;if(!carBlocked(nx,c.y))c.x=nx;else c.vx=0;
+    const ny=c.y+c.vy*dt;if(!carBlocked(c.x,ny))c.y=ny;else c.vy=0;
+    questDrive(Math.abs(c.vx*dt)+Math.abs(c.vy*dt));
     player.x=c.x;player.y=c.y;
-    if(actionDown&&!player._e&&!actionConsumed){player.inCar=null;player.x+=.7;showToast('Saiu do veiculo')}
-  }else{
+    if(actionDown&&!player._e&&!actionConsumed){c.vx=0;c.vy=0;player.inCar=null;player.x+=.7;showToast('Saiu do veiculo')}
+  }else if(!blocked){
     const sp=(Keys.ShiftLeft||touch.xbtn)?player.speed*1.45:player.speed;
     if(dx||dy){
       if(Math.abs(dx)>Math.abs(dy))player.dir=dx>0?'right':'left';else player.dir=dy>0?'down':'up';
@@ -335,18 +580,20 @@ function update(dt){
       if(!entityCollides(player.x,ny,player.w,player.h))player.y=ny;
       player.anim+=dt*8;
     }
-    const npc=activeDialog?null:nearestNpc();
-    const car=activeDialog?null:nearestCar();
-    prompt=!!npc||!!car;
+    const npc=nearestNpc();
+    const shop=npc?null:nearestShop();
+    const car=(npc||shop)?null:nearestCar();
+    prompt=!!npc||!!shop||!!car;
     const promptEl=document.getElementById('prompt');
-    promptEl.textContent=npc?'Pressione E ou clique para conversar':'Pressione E para entrar no carro';
+    promptEl.textContent=npc?'Pressione E ou clique para conversar':shop?('Pressione E para entrar — '+SHOPS[shop.name].title):'Pressione E para entrar no carro';
     if(actionDown&&!player._e&&!actionConsumed){
       if(npc)openNpcDialog(npc);
-      else if(car){player.inCar=car;showToast('Entrou no veiculo')}
+      else if(shop)openShop(shop);
+      else if(car){player.inCar=car;car.vx=0;car.vy=0;showToast('Entrou no veiculo');questEvent('drive_enter')}
     }
   }
   player._e=actionDown;
-  document.getElementById('prompt').style.display=prompt&&!player.inCar&&!activeDialog?'block':'none';
+  document.getElementById('prompt').style.display=(prompt&&!player.inCar&&!blocked)?'block':'none';
   cam.x=Math.max(0,Math.min(MAP_W*TILE-W,player.x*TILE-W/2));
   cam.y=Math.max(0,Math.min(MAP_H*TILE-H,player.y*TILE-H/2));
 }
@@ -480,7 +727,7 @@ function drawMinimap(){
 }
 function loop(t){if(!running)return;const dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);draw();requestAnimationFrame(loop)}
 
-document.getElementById('dialogBox').addEventListener('click',closeNpcDialog);
+document.getElementById('dialogBox').addEventListener('click',advanceDialog);
 canvas.addEventListener('click',e=>{
   if(!running)return;
   const r=canvas.getBoundingClientRect();
@@ -497,7 +744,7 @@ function setupTouch(){
   joy.addEventListener('pointerdown',e=>{joy.setPointerCapture(e.pointerId);const r=joy.getBoundingClientRect();base={x:r.left+r.width/2,y:r.top+r.height/2};touch.active=true;moveJoy(e)});
   joy.addEventListener('pointermove',moveJoy);joy.addEventListener('pointerup',()=>{touch.active=false;touch.x=touch.y=0;knob.style.left='50%';knob.style.top='50%'});
   function moveJoy(e){if(!touch.active||!base)return;const dx=e.clientX-base.x,dy=e.clientY-base.y,d=Math.min(46,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);touch.x=Math.cos(a)*d/46;touch.y=Math.sin(a)*d/46;knob.style.left=`calc(50% + ${Math.cos(a)*d}px)`;knob.style.top=`calc(50% + ${Math.sin(a)*d}px)`}
-  [['btnA','a'],['btnB','b'],['btnX','xbtn']].forEach(([id,k])=>{const el=document.getElementById(id);el.addEventListener('pointerdown',e=>{e.preventDefault();touch[k]=true});el.addEventListener('pointerup',()=>touch[k]=false);el.addEventListener('pointerleave',()=>touch[k]=false)});
+  [['btnA','a'],['btnB','b'],['btnX','xbtn'],['btnY','ybtn']].forEach(([id,k])=>{const el=document.getElementById(id);el.addEventListener('pointerdown',e=>{e.preventDefault();touch[k]=true});el.addEventListener('pointerup',()=>touch[k]=false);el.addEventListener('pointerleave',()=>touch[k]=false)});
 }
 
 const startBtn=document.getElementById('startBtn');

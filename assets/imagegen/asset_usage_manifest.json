@@ -55,6 +55,30 @@
       "path": "tilesets/sidewalk_overlay_sheet.png",
       "usage": "Use as a visual overlay on pavement tiles adjacent to roads. It should be drawn after pavement/road terrain and before buildings, props, cars, and characters."
     },
+    "parkingLot": {
+      "path": "tilesets/parking_lot_tileset.png",
+      "cellSize": [64, 64],
+      "grid": [4, 4],
+      "cells": {
+        "0": "asphalt_base",
+        "1": "parking_stall_top",
+        "2": "parking_stall_bottom",
+        "3": "accessible_stall_top",
+        "4": "sidewalk_curb_top",
+        "5": "sidewalk_curb_bottom",
+        "6": "green_median",
+        "7": "planted_median",
+        "8": "curb_left",
+        "9": "curb_right",
+        "10": "driveway_vertical",
+        "11": "driveway_cross",
+        "12": "corner_top_left",
+        "13": "corner_top_right",
+        "14": "parking_symbol_overlay",
+        "15": "warning_gate"
+      },
+      "usage": "Use as modular 64x64 parking terrain. Parking lots must connect to the road graph via driveway tiles. Parking stall lines align to the same curb and asphalt system as the city streets. Draw cars separately, centered inside a stall; do not bake cars into terrain tiles."
+    },
     "props": {
       "path": "tilesets/park_street_props_sheet.png",
       "cells": {
