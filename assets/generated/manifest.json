@@ -1,0 +1,560 @@
+[
+  {
+    "file": "GTA clone\\assets\\generated\\people\\main_boy.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\people\\main_girl.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\people\\npc_vendor.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\people\\npc_police.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\people\\npc_mechanic.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\people\\npc_medic.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\people\\npc_business.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\people\\npc_street_artist.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\blue_compact.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\red_sports.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\yellow_taxi.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\green_hatchback.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\black_police_cruiser.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\white_police_cruiser.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\delivery_van.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\ambulance.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\armored_truck.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\motorcycle.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\purple_coupe.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\cars\\utility_truck.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\road_straight.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\road_corner.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\crosswalk.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\sidewalk.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\curb.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\grass_planter.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\palm_tree.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\streetlight.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\neon_sign.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\storefront.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\cafe_sign.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\building_wall.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\door.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\window.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\alley_floor.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\road_markings.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\traffic_cone.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\trash_bin.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\tiles\\fire_hydrant.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\joystick_base.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\joystick_knob.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\button_a.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\button_b.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\button_x.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\button_y.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\heart.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\star.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\money_cash_stack.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\weapon_icon.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\backpack_icon.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\map_pin.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\minimap_arrow.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\mission_marker.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\inventory_slot.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\health_kit.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\police_badge.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\car_icon.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\radio_music_note.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\settings_gear.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\dialog_box_frame.png",
+    "size": [
+      160,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\quest_checkbox.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  },
+  {
+    "file": "GTA clone\\assets\\generated\\ui\\wanted_star_icon.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true
+  }
+]

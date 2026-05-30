@@ -1,0 +1,23 @@
+{
+  "file": "D:\\cris\\ai gaming design\\GTA clone\\assets\\imagegen\\tilesets\\sidewalk_overlay_sheet.png",
+  "size": [
+    256,
+    256
+  ],
+  "cell": [
+    64,
+    64
+  ],
+  "cells": {
+    "0": "horizontal bottom curb strip",
+    "1": "horizontal top curb strip",
+    "2": "vertical right curb strip",
+    "3": "vertical left curb strip",
+    "4": "thick horizontal bottom curb strip",
+    "5": "thick horizontal top curb strip",
+    "6": "thick vertical right curb strip",
+    "7": "thick vertical left curb strip",
+    "8-11": "corner caps",
+    "12-15": "curb strips with drains"
+  }
+}

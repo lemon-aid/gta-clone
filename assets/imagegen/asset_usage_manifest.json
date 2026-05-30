@@ -1,0 +1,116 @@
+{
+  "tileSize": 64,
+  "spritesheetGrid": {
+    "width": 256,
+    "height": 256,
+    "columns": 4,
+    "rows": 4,
+    "cellWidth": 64,
+    "cellHeight": 64,
+    "directionRows": ["down", "left", "right", "up"],
+    "animationColumns": ["idle", "stepLeft", "idle", "stepRight"]
+  },
+  "people": {
+    "usage": "Place only on sidewalks, pavement, parks, plazas, building entrances, or pedestrian spaces.",
+    "paths": [
+      "people/main_boy_imagegen.png",
+      "people/main_girl_imagegen.png",
+      "people/hacker_girl_imagegen.png",
+      "people/food_courier_boy_imagegen.png",
+      "people/street_magician_imagegen.png",
+      "people/skate_kid_imagegen.png"
+    ]
+  },
+  "cars": {
+    "usage": "Place only on valid lane tiles or parking slots. Direction must match lane metadata.",
+    "valid": [
+      "cars/yellow_taxi_imagegen.png",
+      "cars/blue_electric_compact_imagegen.png",
+      "cars/green_street_hatchback_imagegen.png",
+      "cars/black_blue_police_cruiser_imagegen.png",
+      "cars/white_cyan_ambulance_van_imagegen.png",
+      "cars/purple_delivery_van_imagegen.png"
+    ],
+    "invalid": [
+      {
+        "path": "cars/red_neon_sports_car_imagegen.png",
+        "reason": "Direction rows are invalid; right-facing row appears vertical."
+      }
+    ],
+    "parking": {
+      "largestMeasuredCarBboxPx": [56, 64],
+      "minimumSlotPx": [70, 78],
+      "rule": "Parking slot must be at least largest car bbox plus 14px padding on each axis total."
+    }
+  },
+  "tilesets": {
+    "roads": {
+      "paths": [
+        "tilesets/roads_sidewalks_terrain_v2.png",
+        "tilesets/sidewalk_overlay_sheet.png"
+      ],
+      "usage": "Use as technical terrain reference. Do not use road arrows. Roads should be represented in the map graph as two-lane corridors."
+    },
+    "sidewalkOverlay": {
+      "path": "tilesets/sidewalk_overlay_sheet.png",
+      "usage": "Use as a visual overlay on pavement tiles adjacent to roads. It should be drawn after pavement/road terrain and before buildings, props, cars, and characters."
+    },
+    "props": {
+      "path": "tilesets/park_street_props_sheet.png",
+      "cells": {
+        "0": "palm",
+        "1": "tree",
+        "2": "bush",
+        "3": "planter",
+        "4": "bench",
+        "5": "picnic_table",
+        "6": "lamp",
+        "7": "traffic_light_large_original",
+        "8": "cone",
+        "9": "barrier",
+        "10": "hydrant",
+        "11": "trash_bin",
+        "12": "parking_meter",
+        "13": "mailbox",
+        "14": "fountain",
+        "15": "neon_sign"
+      },
+      "usage": "Large props can occupy tiles. Traffic lights should usually be redrawn or used as small overlays, not full terrain tiles."
+    },
+    "facades": {
+      "path": "tilesets/building_facades_96_sheet.png",
+      "legacyPath": "tilesets/building_facades_sheet.png",
+      "cellSize": [96, 96],
+      "usage": "Use the 96x96 native facade sheet for gameplay. Collider must match the visual rect: 1.5x1.5 tiles when tileSize is 64. Do not use the old 64x64 facade sheet for new gameplay placement."
+    }
+  },
+  "overlays": {
+    "rule": "Small signs, traffic lights, lamps, hydrants, parking meters, and decorative lights should be placed with pixel offsets and smaller hitboxes. They should not consume a terrain tile unless intentionally used as a large prop.",
+    "recommendedType": {
+      "spriteId": "string",
+      "tileX": "number",
+      "tileY": "number",
+      "offsetX": "number",
+      "offsetY": "number",
+      "anchor": "curb | corner | sidewalk | park",
+      "blocksCars": false,
+      "blocksPedestrians": "optional boolean"
+    }
+  },
+  "roadGraph": {
+    "laneRules": {
+      "horizontalTopLane": "right",
+      "horizontalBottomLane": "left",
+      "verticalLeftLane": "down",
+      "verticalRightLane": "up"
+    },
+    "validation": [
+      "All road tiles must be connected.",
+      "Cars must be on valid lane tiles.",
+      "Cars must face lane direction.",
+      "Buildings must have at least one sidewalk/pavement tile between footprint and road.",
+      "Crosswalks must span the full road width.",
+      "Parking lots must connect to roads by driveway."
+    ]
+  }
+}

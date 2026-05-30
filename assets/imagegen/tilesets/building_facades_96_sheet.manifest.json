@@ -1,0 +1,35 @@
+{
+  "file": "D:\\cris\\ai gaming design\\GTA clone\\assets\\imagegen\\tilesets\\building_facades_96_sheet.png",
+  "source": "C:\\Users\\assuk\\.codex\\generated_images\\019e13e6-52a5-7250-ac55-63a8b94f805f\\ig_0b0c3e1c9cfbc3ee016a012edc67508195ae59421f31ccfe31.png",
+  "size": [
+    384,
+    384
+  ],
+  "grid": [
+    4,
+    4
+  ],
+  "cell": [
+    96,
+    96
+  ],
+  "order": [
+    "cafe_pink",
+    "corner_cafe",
+    "hospital",
+    "police_station",
+    "parking_garage",
+    "arcade",
+    "nightclub",
+    "hotel",
+    "bank",
+    "mechanic",
+    "convenience_store",
+    "flower_shop",
+    "apartment",
+    "brick_shop",
+    "office_tower",
+    "townhouse"
+  ],
+  "transparent_corners": true
+}

@@ -1,0 +1,22 @@
+{
+  "grid": [
+    20,
+    14
+  ],
+  "tile_size": 64,
+  "changes": [
+    "buildings moved to one sidewalk tile from road",
+    "facade sprites are not stretched",
+    "parking slot size computed from largest car bbox",
+    "red car omitted because its direction rows are invalid"
+  ],
+  "parking_slot_px": [
+    70,
+    78
+  ],
+  "largest_car_bbox_px": [
+    56,
+    64
+  ],
+  "image": "D:\\cris\\ai gaming design\\GTA clone\\assets\\imagegen\\examples\\city_chunk_rules_v4.png"
+}

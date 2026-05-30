@@ -1,0 +1,47 @@
+{
+  "image": "D:\\cris\\ai gaming design\\GTA clone\\assets\\imagegen\\examples\\game_ui_final_example.png",
+  "worldSource": "examples/city_chunk_rules_v4.png",
+  "canvas": [
+    1280,
+    896
+  ],
+  "uiSheets": {
+    "touchControls": "ui/touch_controls_sheet.png",
+    "hudStatusMission": "ui/hud_status_mission_sheet.png",
+    "inventoryItems": "ui/inventory_items_sheet.png",
+    "panelsSlotsFrames": "ui/panels_slots_frames_sheet.png"
+  },
+  "regions": {
+    "statusHud": [
+      18,
+      18,
+      330,
+      112
+    ],
+    "minimap": [
+      24,
+      128,
+      154,
+      154
+    ],
+    "missionCard": [
+      360,
+      18,
+      780,
+      118
+    ],
+    "quickInventory": [
+      956,
+      132,
+      1256,
+      274
+    ],
+    "joystick": [
+      44,
+      724,
+      132,
+      132
+    ],
+    "actionButtons": "bottom-right diamond layout"
+  }
+}

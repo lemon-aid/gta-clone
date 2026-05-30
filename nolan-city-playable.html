@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Nolan City - Playable Prototype</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:Arial,Helvetica,sans-serif;color:#fff}
+#game{display:block;width:100vw;height:100vh;image-rendering:auto;background:#090c24}
+#hud{position:fixed;inset:0;pointer-events:none}
+.panel{position:absolute;background:rgba(13,20,61,.86);border:3px solid #3cdeff;border-radius:14px;box-shadow:0 0 18px rgba(60,222,255,.35),inset 0 0 24px rgba(30,50,120,.45)}
+#status{left:18px;top:18px;width:312px;height:94px;padding:14px 16px}
+#mission{left:360px;top:18px;width:420px;height:100px;border-color:#ff5dbf;padding:14px 18px}
+#inventory{right:24px;top:132px;width:300px;height:142px;padding:12px 16px;display:none}
+#menuPanel{position:absolute;right:24px;top:86px;width:180px;padding:10px;display:none;pointer-events:auto}
+#menuPanel button{width:100%;height:42px;border:2px solid #3cdeff;border-radius:10px;background:#0d143d;color:#fff;font-weight:900;font-size:15px;cursor:pointer}
+#radio{left:350px;bottom:18px;width:310px;height:56px;padding:10px 16px}
+#minimap{position:absolute;left:24px;top:128px;width:154px;height:154px;border-radius:50%;border:4px solid #3cdeff;background:rgba(9,17,50,.9);box-shadow:0 0 20px rgba(60,222,255,.45);overflow:hidden}
+#miniCanvas{width:100%;height:100%;display:block}
+#controls{position:absolute;inset:0;pointer-events:none}
+.sprite{display:inline-block;background-repeat:no-repeat;background-size:256px 256px;vertical-align:middle}
+.hudline{display:flex;align-items:center;gap:10px;font-weight:900}
+.cash{color:#67eb62;font-size:24px}
+.hp{font-size:24px}
+.stars{display:flex;gap:6px;margin-top:12px}
+.mission-title{color:#ffd33f;font-size:19px;font-weight:900;margin-bottom:8px}
+.mission-copy{font-size:15px;color:#f6f4ff;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mission-ok{color:#67eb62;font-size:15px;font-weight:700}
+.inv-title{font-size:18px;font-weight:900;margin-bottom:16px}
+.inv-grid{display:grid;grid-template-columns:repeat(3,44px);grid-auto-rows:44px;gap:14px 22px;justify-content:center}
+.slot{position:relative;width:44px;height:44px}
+.slot .sprite{position:absolute;left:0;top:0}
+.slot .item{left:6px;top:6px}
+.radio-title{font-size:18px;font-weight:900}
+.radio-sub{font-size:14px;color:#ccd6ff}
+#prompt{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);padding:12px 20px;border:2px solid #ffd33f;border-radius:10px;background:rgba(13,20,61,.92);font-weight:800;display:none}
+#toast{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);padding:12px 22px;border:2px solid #ff5dbf;border-radius:10px;background:rgba(13,20,61,.94);font-weight:900;display:none}
+#dialogBox{left:50%;bottom:26px;transform:translateX(-50%);width:min(560px,calc(100vw - 40px));padding:16px 18px;border-color:#ff5dbf;display:none;pointer-events:auto}
+#dialogName{color:#ffd33f;font-size:18px;font-weight:900;margin-bottom:8px}
+#dialogText{font-size:16px;line-height:1.35;color:#f8f6ff}
+#dialogHint{margin-top:10px;font-size:12px;color:#9edfff;font-weight:800;text-align:right}
+#joy{position:absolute;left:44px;bottom:44px;width:132px;height:132px;pointer-events:auto;touch-action:none}
+#knob{position:absolute;left:50%;top:50%;width:64px;height:64px;transform:translate(-50%,-50%)}
+.btn{position:absolute;width:66px;height:66px;pointer-events:auto;touch-action:none}
+#btnX{right:142px;bottom:112px}
+#btnY{right:88px;bottom:154px}
+#btnA{right:88px;bottom:70px}
+#btnB{right:34px;bottom:112px}
+#pauseBtn{position:absolute;right:92px;top:24px;width:52px;height:52px;pointer-events:auto}
+#settingsBtn{position:absolute;right:24px;top:24px;width:52px;height:52px;pointer-events:auto}
+#start{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at 50% 40%,#231055,#070718);z-index:20}
+#start h1{font-size:54px;letter-spacing:1px;color:#fff;text-shadow:0 0 20px #ff5dbf;margin-bottom:8px}
+#start p{color:#ccd6ff;margin-bottom:24px}
+#start button{pointer-events:auto;padding:14px 28px;border-radius:10px;border:2px solid #3cdeff;background:#0d143d;color:#fff;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 0 24px rgba(60,222,255,.35)}
+.hidden{display:none!important}
+@media (max-width:800px){
+  #mission{left:18px;top:122px;width:calc(100vw - 36px)}
+  #inventory{right:18px;top:auto;bottom:190px}
+  #menuPanel{right:18px}
+  #radio{display:none}
+}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+  <div id="status" class="panel">
+    <div class="hudline">
+      <span id="heart" class="sprite"></span><span class="hp" id="hp">100</span>
+      <span id="moneyIcon" class="sprite" style="margin-left:28px"></span><span class="cash" id="cash">$12,840</span>
+    </div>
+    <div class="stars" id="stars"></div>
+  </div>
+  <div id="mission" class="panel">
+    <div class="mission-title">Fuga da Cidade</div>
+    <div class="mission-copy" id="missionCopy">Entre em um carro e siga pelas ruas conectadas.</div>
+    <div class="mission-ok">✓ Rota calculada</div>
+  </div>
+  <div id="minimap"><canvas id="miniCanvas" width="154" height="154"></canvas></div>
+  <div id="inventory" class="panel">
+    <div class="inv-title">Inventario Rapido</div>
+    <div class="inv-grid" id="invGrid"></div>
+  </div>
+  <div id="menuPanel" class="panel"><button id="inventoryMenuBtn">Inventário</button></div>
+  <div id="radio" class="panel">
+    <div class="radio-title">♫ Radio Los Santos</div>
+    <div class="radio-sub">Synthwave 88.3 FM</div>
+  </div>
+  <div id="prompt">Pressione E para entrar no carro</div>
+  <div id="toast"></div>
+  <div id="dialogBox" class="panel">
+    <div id="dialogName"></div>
+    <div id="dialogText"></div>
+    <div id="dialogHint">E / clique para fechar</div>
+  </div>
+  <div id="controls">
+    <div id="joy"><span class="sprite" id="joyBase"></span><span class="sprite" id="knob"></span></div>
+    <span class="sprite btn" id="btnX"></span>
+    <span class="sprite btn" id="btnY"></span>
+    <span class="sprite btn" id="btnA"></span>
+    <span class="sprite btn" id="btnB"></span>
+    <span class="sprite" id="pauseBtn"></span>
+    <span class="sprite" id="settingsBtn"></span>
+  </div>
+</div>
+<div id="start">
+  <h1>Nolan City</h1>
+  <p>Protótipo jogável top-down com sprites gerados</p>
+  <button id="startBtn" disabled>Carregando...</button>
+</div>
+<script>
+const TILE=64;
+const MAP_W=44, MAP_H=32;
+const AS='assets/imagegen/';
+const ASSETS={
+  people:{boy:AS+'people/main_boy_imagegen.png',girl:AS+'people/main_girl_imagegen.png',hacker:AS+'people/hacker_girl_imagegen.png',courier:AS+'people/food_courier_boy_imagegen.png',magician:AS+'people/street_magician_imagegen.png',skate:AS+'people/skate_kid_imagegen.png'},
+  cars:{taxi:AS+'cars/yellow_taxi_imagegen.png',blue:AS+'cars/blue_electric_compact_imagegen.png',green:AS+'cars/green_street_hatchback_imagegen.png',police:AS+'cars/black_blue_police_cruiser_imagegen.png',ambulance:AS+'cars/white_cyan_ambulance_van_imagegen.png',van:AS+'cars/purple_delivery_van_imagegen.png'},
+  tiles:{props:AS+'tilesets/park_street_props_sheet.png',facades:AS+'tilesets/building_facades_96_sheet.png',sidewalkOverlay:AS+'tilesets/sidewalk_overlay_sheet.png'},
+  ui:{touch:AS+'ui/touch_controls_sheet.png',hud:AS+'ui/hud_status_mission_sheet.png',inv:AS+'ui/inventory_items_sheet.png',panels:AS+'ui/panels_slots_frames_sheet.png'}
+};
+const img={};
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const mini=document.getElementById('miniCanvas'),mctx=mini.getContext('2d');
+let W=innerWidth,H=innerHeight,DPR=Math.max(1,Math.min(devicePixelRatio||1,2));
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.max(1,Math.min(devicePixelRatio||1,2));canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',resize);resize();
+function loadImage(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src})}
+async function loadAll(){for(const group of Object.values(ASSETS)){for(const [k,src] of Object.entries(group)){img[src]=await loadImage(src)}}}
+function sheet(src,row,col,cell=TILE){return {img:img[src],sx:col*cell,sy:row*cell,sw:cell,sh:cell}}
+function drawSheet(s,x,y,w=TILE,h=TILE){ctx.drawImage(s.img,s.sx,s.sy,s.sw,s.sh,x,y,w,h)}
+function uiBg(el,src,index,size=64){el.style.backgroundImage=`url("${src}")`;el.style.backgroundSize=`${size*4}px ${size*4}px`;el.style.width=size+'px';el.style.height=size+'px';el.style.backgroundPosition=`-${(index%4)*size}px -${Math.floor(index/4)*size}px`}
+function dirRow(d){return {down:0,left:1,right:2,up:3}[d]||0}
+
+const Keys={};
+let debugColliders=false;
+addEventListener('keydown',e=>{Keys[e.code]=true;if(e.code==='KeyC'&&!e.repeat)debugColliders=!debugColliders;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault()});
+addEventListener('keyup',e=>{Keys[e.code]=false});
+
+const map={road:new Set(),lanes:new Map(),buildings:[],props:[],overlays:[],parks:new Set(),parking:[]};
+const BUILDING_CELL=96;
+const BUILDING_W=BUILDING_CELL/TILE;
+const BUILDING_H=BUILDING_CELL/TILE;
+const BUILDING_BOUNDS=[
+  {x:7,y:11,w:89,h:83},{x:4,y:9,w:89,h:85},{x:3,y:9,w:93,h:85},{x:0,y:9,w:90,h:85},
+  {x:7,y:7,w:83,h:89},{x:4,y:9,w:92,h:82},{x:0,y:6,w:87,h:81},{x:0,y:4,w:88,h:90},
+  {x:5,y:0,w:86,h:96},{x:1,y:9,w:88,h:87},{x:1,y:9,w:95,h:87},{x:0,y:4,w:93,h:92},
+  {x:6,y:0,w:77,h:78},{x:7,y:0,w:89,h:78},{x:0,y:0,w:81,h:82},{x:2,y:0,w:79,h:80}
+];
+const NPC_W=.42,NPC_H=.64;
+const PROP_BOUNDS={
+  palm:{x:.20,y:.12,w:.60,h:.78},
+  tree:{x:.18,y:.12,w:.64,h:.78},
+  bush:{x:.18,y:.28,w:.64,h:.50},
+  fountain:{x:.13,y:.12,w:.74,h:.74},
+  bench:{x:.06,y:.44,w:.88,h:.34},
+  picnic:{x:.12,y:.20,w:.76,h:.62},
+  trash:{x:.30,y:.20,w:.40,h:.66},
+  sign:{x:.34,y:.18,w:.32,h:.72},
+  lamp:{x:.42,y:.16,w:.16,h:.78},
+  meter:{x:.36,y:.18,w:.28,h:.70}
+};
+const TRAFFIC_BOUNDS={x:.02,y:.04,w:.20,h:.70};
+const NPC_DIALOG={
+  hacker:{name:'Luna',text:'As cameras estao limpas por enquanto. Se voce precisar abrir um portao ou rastrear um carro, eu consigo fazer isso rapido.'},
+  girl:{name:'Mia',text:'Vi um carro suspeito passando pelo cafe. Ele seguiu pela avenida principal, sempre na pista da direita.'},
+  courier:{name:'Dani',text:'Entrega atrasada, cidade cheia. Se achar cones na rua, desvie com calma porque eles agora bloqueiam a passagem.'},
+  magician:{name:'Niko',text:'Um truque bom depende de distancia. Chegue perto dos NPCs e pressione E para conversar sem acertar o collider errado.'},
+  skate:{name:'Theo',text:'A calcada esta livre para pedestres, mas rua e para carro. Os predios devem ficar grudados na calcada, nao no asfalto.'}
+};
+function key(x,y){return x+','+y}
+function isRoad(x,y){return map.road.has(key(x,y))}
+function laneAt(x,y){return map.lanes.get(key(Math.floor(x),Math.floor(y)))}
+function addRoad(x,y,dir){map.road.add(key(x,y));map.lanes.set(key(x,y),{x,y,dir})}
+function buildMap(){
+  const hPairs=[[5,6],[15,16],[25,26]], vPairs=[[8,9],[22,23],[35,36]];
+  for(const [y0,y1] of hPairs){
+    for(let x=0;x<MAP_W;x++){addRoad(x,y0,'right');addRoad(x,y1,'left')}
+  }
+  for(const [x0,x1] of vPairs){
+    for(let y=0;y<MAP_H;y++){addRoad(x0,y,'down');addRoad(x1,y,'up')}
+  }
+  for(let x=1;x<7;x++)for(let y=9;y<14;y++)map.parks.add(key(x,y));
+  const facade=(name,index,x,y)=>map.buildings.push({name,index,x,y,w:BUILDING_W,h:BUILDING_H});
+  facade('cafe',4,1,4); facade('hospital',6,4,4); facade('police',7,11,4); facade('garage',8,18,4); facade('arcade',2,29,4); facade('club',11,32,4); facade('hotel',12,39,4);
+  facade('bank',9,1,17); facade('mechanic',13,5,17); facade('store',10,18,14); facade('office',15,25,14); facade('flower',3,38,14);
+  for(const p of [['palm',0,1,10],['tree',1,4,10],['fountain',14,2,11],['bench',4,1,13],['picnic',5,4,13],['bush',2,6,12],['lamp',6,7,4],['lamp',6,21,14],['trash',11,17,4],['meter',12,38,17],['sign',15,6,15]])map.props.push({name:p[0],index:p[1],x:p[2],y:p[3]});
+  for(const o of [[7.8,4.55],[10.2,7.0],[21.8,14.5],[24.2,17.0],[34.8,24.5],[37.2,27.0]])map.overlays.push({type:'traffic',x:o[0],y:o[1]});
+  for(let x=37;x<42;x++)for(let y=18;y<21;y++)map.parking.push({x,y});
+}
+buildMap();
+
+const cars=[
+  {kind:'taxi',x:3,y:5,dir:'right',speed:2.0,path:'h',lane:5},
+  {kind:'blue',x:18,y:6,dir:'left',speed:1.7,path:'h',lane:6},
+  {kind:'green',x:6,y:16,dir:'left',speed:1.4,path:'h',lane:16},
+  {kind:'police',x:8,y:2,dir:'down',speed:1.6,path:'v',lane:8},
+  {kind:'ambulance',x:9,y:13,dir:'up',speed:1.8,path:'v',lane:9},
+  {kind:'van',x:35,y:13,dir:'down',speed:1.3,path:'v',lane:35}
+];
+const npcs=[
+  {kind:'hacker',x:2,y:3,dir:'down'}, {kind:'girl',x:24,y:10,dir:'left'}, {kind:'courier',x:39,y:18,dir:'right'}, {kind:'magician',x:2,y:13,dir:'down'}, {kind:'skate',x:39,y:4,dir:'left'},
+  {kind:'hacker',x:17,y:13,dir:'right'}, {kind:'courier',x:29,y:18,dir:'left'}, {kind:'girl',x:12,y:12,dir:'down'}, {kind:'magician',x:5,y:23,dir:'up'}
+];
+const player={x:13.5,y:4.7,w:.42,h:.64,dir:'down',speed:3.4,anim:0,inCar:null,hp:100,cash:12840,wanted:3};
+const cam={x:0,y:0};
+const touch={x:0,y:0,active:false,a:false,b:false,xbtn:false};
+let running=false,last=0,toastTimer=0,prompt=false,activeDialog=null;
+
+function setupUI(){
+  uiBg(document.getElementById('heart'),ASSETS.ui.hud,0,36);
+  uiBg(document.getElementById('moneyIcon'),ASSETS.ui.hud,3,36);
+  const stars=document.getElementById('stars');stars.innerHTML='';
+  for(let i=0;i<5;i++){const s=document.createElement('span');s.className='sprite';uiBg(s,ASSETS.ui.hud,i<player.wanted?1:2,28);stars.appendChild(s)}
+  const grid=document.getElementById('invGrid');grid.innerHTML='';
+  [0,1,7,13,4,15].forEach((idx,i)=>{const slot=document.createElement('div');slot.className='slot';const fr=document.createElement('span');fr.className='sprite';uiBg(fr,ASSETS.ui.panels,i===0?1:0,44);const it=document.createElement('span');it.className='sprite item';uiBg(it,ASSETS.ui.inv,idx,32);slot.append(fr,it);grid.appendChild(slot)});
+  uiBg(document.getElementById('joyBase'),ASSETS.ui.touch,0,132);
+  uiBg(document.getElementById('knob'),ASSETS.ui.touch,1,64);
+  uiBg(document.getElementById('btnX'),ASSETS.ui.touch,8,66);
+  uiBg(document.getElementById('btnY'),ASSETS.ui.touch,9,66);
+  uiBg(document.getElementById('btnA'),ASSETS.ui.touch,6,66);
+  uiBg(document.getElementById('btnB'),ASSETS.ui.touch,7,66);
+  uiBg(document.getElementById('pauseBtn'),ASSETS.ui.touch,10,52);
+  uiBg(document.getElementById('settingsBtn'),ASSETS.ui.touch,15,52);
+  const menu=document.getElementById('menuPanel');
+  const invPanel=document.getElementById('inventory');
+  document.getElementById('settingsBtn').onclick=()=>{menu.style.display=menu.style.display==='block'?'none':'block'};
+  document.getElementById('inventoryMenuBtn').onclick=()=>{
+    invPanel.style.display=invPanel.style.display==='block'?'none':'block';
+    menu.style.display='none';
+  };
+}
+
+function pointInRect(x,y,r){return x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h}
+function buildingRect(b){
+  const bb=BUILDING_BOUNDS[b.index]||{x:0,y:0,w:BUILDING_CELL,h:BUILDING_CELL};
+  return {x:b.x+bb.x/TILE,y:b.y+bb.y/TILE,w:bb.w/TILE,h:bb.h/TILE};
+}
+function propRect(p){
+  const d=PROP_BOUNDS[p.name]||{x:.2,y:.2,w:.6,h:.6};
+  return {x:p.x+d.x,y:p.y+d.y,w:d.w,h:d.h};
+}
+function overlayRect(o){return {x:o.x+TRAFFIC_BOUNDS.x,y:o.y+TRAFFIC_BOUNDS.y,w:TRAFFIC_BOUNDS.w,h:TRAFFIC_BOUNDS.h}}
+function npcRect(n){return {x:n.x+(1-NPC_W)/2,y:n.y+(1-NPC_H)/2,w:NPC_W,h:NPC_H}}
+function rectCenter(r){return {x:r.x+r.w/2,y:r.y+r.h/2}}
+function isNpcNear(n){
+  const c=rectCenter(npcRect(n));
+  return Math.hypot(c.x-player.x,c.y-player.y)<1.35;
+}
+function nearestNpc(){
+  let best=null,bd=999;
+  for(const n of npcs){
+    const c=rectCenter(npcRect(n));
+    const d=Math.hypot(c.x-player.x,c.y-player.y);
+    if(d<bd){bd=d;best=n}
+  }
+  return bd<1.35?best:null;
+}
+function npcAtWorld(x,y){
+  for(let i=npcs.length-1;i>=0;i--){
+    if(pointInRect(x,y,npcRect(npcs[i])))return npcs[i];
+  }
+  return null;
+}
+function openNpcDialog(n){
+  const data=NPC_DIALOG[n.kind]||{name:'Morador',text:'Oi! A cidade ainda esta ganhando vida, mas voce ja pode conversar com NPCs por perto.'};
+  activeDialog=n;
+  document.getElementById('dialogName').textContent=data.name;
+  document.getElementById('dialogText').textContent=data.text;
+  document.getElementById('dialogBox').style.display='block';
+  document.getElementById('prompt').style.display='none';
+}
+function closeNpcDialog(){
+  activeDialog=null;
+  document.getElementById('dialogBox').style.display='none';
+}
+
+function solidAt(x,y){
+  const tx=Math.floor(x),ty=Math.floor(y);
+  if(tx<0||ty<0||tx>=MAP_W||ty>=MAP_H)return true;
+  for(const b of map.buildings){
+    if(pointInRect(x,y,buildingRect(b)))return true;
+  }
+  for(const p of map.props)if(pointInRect(x,y,propRect(p)))return true;
+  for(const o of map.overlays)if(pointInRect(x,y,overlayRect(o)))return true;
+  for(const n of npcs)if(pointInRect(x,y,npcRect(n)))return true;
+  return false;
+}
+function entityCollides(x,y,w,h){return solidAt(x-w/2,y-h/2)||solidAt(x+w/2,y-h/2)||solidAt(x-w/2,y+h/2)||solidAt(x+w/2,y+h/2)}
+function ensurePlayerSpawnClear(){
+  if(!entityCollides(player.x,player.y,player.w,player.h))return;
+  const candidates=[[13.5,4.7],[12.5,3.7],[10.5,3.7],[13.5,3.7],[12.5,7.3],[16.5,4.7],[5.5,3.7],[3.5,7.7]];
+  for(const [x,y] of candidates){
+    if(!entityCollides(x,y,player.w,player.h)){player.x=x;player.y=y;return}
+  }
+}
+ensurePlayerSpawnClear();
+function nearestCar(){
+  let best=null,bd=999;
+  for(const c of cars){const d=Math.hypot(c.x-player.x,c.y-player.y);if(d<bd){bd=d;best=c}}
+  return bd<1.15?best:null;
+}
+function showToast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';toastTimer=1.4}
+function update(dt){
+  if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)document.getElementById('toast').style.display='none'}
+  for(const c of cars){
+    const s=c.speed*dt;
+    if(c.dir==='right'){c.x+=s;if(c.x>MAP_W-1)c.x=0}
+    if(c.dir==='left'){c.x-=s;if(c.x<0)c.x=MAP_W-1}
+    if(c.dir==='down'){c.y+=s;if(c.y>MAP_H-1)c.y=0}
+    if(c.dir==='up'){c.y-=s;if(c.y<0)c.y=MAP_H-1}
+  }
+  const actionDown=Keys.KeyE||touch.a;
+  let actionConsumed=false;
+  if(activeDialog&&actionDown&&!player._e){closeNpcDialog();actionConsumed=true}
+  let dx=0,dy=0;
+  if(!activeDialog){
+    if(Keys.KeyW||Keys.ArrowUp)dy-=1;if(Keys.KeyS||Keys.ArrowDown)dy+=1;if(Keys.KeyA||Keys.ArrowLeft)dx-=1;if(Keys.KeyD||Keys.ArrowRight)dx+=1;
+    if(touch.active){dx+=touch.x;dy+=touch.y}
+  }
+  const len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;
+  if(player.inCar){
+    const c=player.inCar;
+    const accel=5.5*dt;
+    if(Math.abs(dx)>Math.abs(dy)){c.dir=dx>=0?'right':'left';c.x+=dx*accel}
+    else if(Math.abs(dy)>0){c.dir=dy>=0?'down':'up';c.y+=dy*accel}
+    player.x=c.x;player.y=c.y;
+    if(actionDown&&!player._e&&!actionConsumed){player.inCar=null;player.x+=.7;showToast('Saiu do veiculo')}
+  }else{
+    const sp=(Keys.ShiftLeft||touch.xbtn)?player.speed*1.45:player.speed;
+    if(dx||dy){
+      if(Math.abs(dx)>Math.abs(dy))player.dir=dx>0?'right':'left';else player.dir=dy>0?'down':'up';
+      const nx=player.x+dx*sp*dt,ny=player.y+dy*sp*dt;
+      if(!entityCollides(nx,player.y,player.w,player.h))player.x=nx;
+      if(!entityCollides(player.x,ny,player.w,player.h))player.y=ny;
+      player.anim+=dt*8;
+    }
+    const npc=activeDialog?null:nearestNpc();
+    const car=activeDialog?null:nearestCar();
+    prompt=!!npc||!!car;
+    const promptEl=document.getElementById('prompt');
+    promptEl.textContent=npc?'Pressione E ou clique para conversar':'Pressione E para entrar no carro';
+    if(actionDown&&!player._e&&!actionConsumed){
+      if(npc)openNpcDialog(npc);
+      else if(car){player.inCar=car;showToast('Entrou no veiculo')}
+    }
+  }
+  player._e=actionDown;
+  document.getElementById('prompt').style.display=prompt&&!player.inCar&&!activeDialog?'block':'none';
+  cam.x=Math.max(0,Math.min(MAP_W*TILE-W,player.x*TILE-W/2));
+  cam.y=Math.max(0,Math.min(MAP_H*TILE-H,player.y*TILE-H/2));
+}
+
+function drawPavement(x,y){
+  const px=x*TILE-cam.x,py=y*TILE-cam.y;
+  ctx.fillStyle='#605782';ctx.fillRect(px,py,TILE,TILE);
+  ctx.strokeStyle='#423c5f';ctx.lineWidth=1;ctx.strokeRect(px,py,TILE,TILE);
+  if((x+y)%4===0){ctx.fillStyle='#ff74d4';ctx.fillRect(px+13,py+17,1,1)}
+  if((x*2+y)%5===0){ctx.fillStyle='#42e8ff';ctx.fillRect(px+49,py+43,1,1)}
+}
+function drawRoad(x,y){
+  const px=x*TILE-cam.x,py=y*TILE-cam.y;
+  ctx.fillStyle='#232639';ctx.fillRect(px,py,TILE,TILE);
+  ctx.fillStyle='#343852';ctx.fillRect(px+12,py+14,3,2);ctx.fillRect(px+36,py+29,3,2);ctx.fillRect(px+22,py+52,3,2);
+  ctx.strokeStyle='#9986be';ctx.lineWidth=5;
+  if(!isRoad(x,y-1)){ctx.beginPath();ctx.moveTo(px,py+2);ctx.lineTo(px+TILE,py+2);ctx.stroke()}
+  if(!isRoad(x,y+1)){ctx.beginPath();ctx.moveTo(px,py+TILE-2);ctx.lineTo(px+TILE,py+TILE-2);ctx.stroke()}
+  if(!isRoad(x-1,y)){ctx.beginPath();ctx.moveTo(px+2,py);ctx.lineTo(px+2,py+TILE);ctx.stroke()}
+  if(!isRoad(x+1,y)){ctx.beginPath();ctx.moveTo(px+TILE-2,py);ctx.lineTo(px+TILE-2,py+TILE);ctx.stroke()}
+}
+function drawGrass(x,y){
+  const px=x*TILE-cam.x,py=y*TILE-cam.y;
+  ctx.fillStyle='#256c4e';ctx.fillRect(px,py,TILE,TILE);
+  ctx.strokeStyle='#184d3a';ctx.lineWidth=2;ctx.strokeRect(px+1,py+1,TILE-2,TILE-2);
+}
+function drawLaneLines(){
+  ctx.strokeStyle='#ffd23c';ctx.lineWidth=3;ctx.setLineDash([22,24]);
+  for(const y of [5,15,25]){const py=(y+1)*TILE-cam.y;ctx.beginPath();ctx.moveTo(-cam.x,py);ctx.lineTo(MAP_W*TILE-cam.x,py);ctx.stroke()}
+  for(const x of [8,22,35]){const px=(x+1)*TILE-cam.x;ctx.beginPath();ctx.moveTo(px,-cam.y);ctx.lineTo(px,MAP_H*TILE-cam.y);ctx.stroke()}
+  ctx.setLineDash([]);
+}
+function drawCrosswalks(){
+  ctx.fillStyle='#e8e8ff';
+  const hs=[5,15,25],vs=[8,22,35];
+  for(const vx of vs)for(const y of [4,6,14,16,24,26])for(let i=0;i<6;i++){ctx.fillRect(vx*TILE-cam.x+8+i*9,y*TILE-cam.y+6,5,52);ctx.fillRect((vx+1)*TILE-cam.x+8+i*9,y*TILE-cam.y+6,5,52)}
+  for(const hy of hs)for(const x of [7,9,21,23,34,36])for(let i=0;i<6;i++){ctx.fillRect(x*TILE-cam.x+6,hy*TILE-cam.y+8+i*9,52,5);ctx.fillRect(x*TILE-cam.x+6,(hy+1)*TILE-cam.y+8+i*9,52,5)}
+}
+function drawSidewalkOverlays(){
+  const s0=sheet(ASSETS.tiles.sidewalkOverlay,0,0);
+  const s1=sheet(ASSETS.tiles.sidewalkOverlay,0,1);
+  const s2=sheet(ASSETS.tiles.sidewalkOverlay,0,2);
+  const s3=sheet(ASSETS.tiles.sidewalkOverlay,0,3);
+  const x0=Math.floor(cam.x/TILE)-1,y0=Math.floor(cam.y/TILE)-1,x1=Math.ceil((cam.x+W)/TILE)+1,y1=Math.ceil((cam.y+H)/TILE)+1;
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+    if(x<0||y<0||x>=MAP_W||y>=MAP_H||isRoad(x,y)||map.parks.has(key(x,y)))continue;
+    const px=x*TILE-cam.x,py=y*TILE-cam.y;
+    if(isRoad(x,y+1))drawSheet(s0,px,py);
+    if(isRoad(x,y-1))drawSheet(s1,px,py);
+    if(isRoad(x+1,y))drawSheet(s2,px,py);
+    if(isRoad(x-1,y))drawSheet(s3,px,py);
+  }
+}
+function drawBuilding(b){
+  const s=sheet(ASSETS.tiles.facades,Math.floor(b.index/4),b.index%4,BUILDING_CELL);
+  drawSheet(s,b.x*TILE-cam.x,b.y*TILE-cam.y,BUILDING_CELL,BUILDING_CELL);
+}
+function drawBuildingColliders(){
+  if(!debugColliders)return;
+  ctx.save();
+  ctx.lineWidth=2;
+  function drawTileRect(r,stroke,fill){
+    const x=r.x*TILE-cam.x, y=r.y*TILE-cam.y, w=r.w*TILE, h=r.h*TILE;
+    ctx.strokeStyle=stroke;ctx.fillStyle=fill;
+    ctx.fillRect(x,y,w,h);
+    ctx.strokeRect(x,y,w,h);
+  }
+  for(const b of map.buildings){
+    drawTileRect(buildingRect(b),'rgba(255,0,80,.95)','rgba(255,0,80,.12)');
+  }
+  for(const p of map.props){
+    drawTileRect(propRect(p),'rgba(255,185,55,.95)','rgba(255,185,55,.16)');
+  }
+  for(const o of map.overlays){
+    drawTileRect(overlayRect(o),'rgba(255,240,80,.95)','rgba(255,240,80,.18)');
+  }
+  for(const n of npcs){
+    drawTileRect(npcRect(n),'rgba(60,222,255,.95)','rgba(60,222,255,.16)');
+  }
+  if(!player.inCar){
+    drawTileRect({x:player.x-player.w/2,y:player.y-player.h/2,w:player.w,h:player.h},'rgba(80,255,120,.95)','rgba(80,255,120,.14)');
+  }
+  ctx.restore();
+}
+function drawTrafficLight(o){
+  const px=o.x*TILE-cam.x,py=o.y*TILE-cam.y;
+  ctx.fillStyle='#13152a';ctx.strokeStyle='#9986be';ctx.lineWidth=2;
+  roundRect(px,py,13,30,4,true,true);
+  ctx.fillStyle='#ff4659';ctx.beginPath();ctx.arc(px+6.5,py+7,3,0,7);ctx.fill();
+  ctx.fillStyle='#ffd23c';ctx.beginPath();ctx.arc(px+6.5,py+15,3,0,7);ctx.fill();
+  ctx.fillStyle='#49dc7e';ctx.beginPath();ctx.arc(px+6.5,py+23,3,0,7);ctx.fill();
+  ctx.strokeStyle='#2a2746';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px+6,py+30);ctx.lineTo(px+6,py+44);ctx.stroke();
+}
+function roundRect(x,y,w,h,r,fill,stroke){
+  ctx.beginPath();
+  if(ctx.roundRect){
+    ctx.roundRect(x,y,w,h,r);
+  }else{
+    ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+  }
+  if(fill)ctx.fill();if(stroke)ctx.stroke()
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const x0=Math.floor(cam.x/TILE)-1,y0=Math.floor(cam.y/TILE)-1,x1=Math.ceil((cam.x+W)/TILE)+1,y1=Math.ceil((cam.y+H)/TILE)+1;
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){if(x<0||y<0||x>=MAP_W||y>=MAP_H)continue;if(map.parks.has(key(x,y)))drawGrass(x,y);else if(isRoad(x,y))drawRoad(x,y);else drawPavement(x,y)}
+  drawSidewalkOverlays();drawLaneLines();drawCrosswalks();
+  const propImg=img[ASSETS.tiles.props],facImg=img[ASSETS.tiles.facades];
+  for(const b of map.buildings)drawBuilding(b)
+  for(const p of map.props){const s=sheet(ASSETS.tiles.props,Math.floor(p.index/4),p.index%4);drawSheet(s,p.x*TILE-cam.x,p.y*TILE-cam.y)}
+  for(const c of cars){drawSheet(sheet(ASSETS.cars[c.kind],dirRow(c.dir),0),c.x*TILE-cam.x,c.y*TILE-cam.y)}
+  for(const n of npcs){drawSheet(sheet(ASSETS.people[n.kind],dirRow(n.dir),0),n.x*TILE-cam.x,n.y*TILE-cam.y)}
+  if(!player.inCar){
+    const col=Math.floor(player.anim)%4;
+    drawSheet(sheet(ASSETS.people.boy,dirRow(player.dir),col),player.x*TILE-cam.x-TILE/2,player.y*TILE-cam.y-TILE/2);
+  }
+  for(const o of map.overlays)drawTrafficLight(o);
+  drawBuildingColliders();
+  drawMinimap();
+}
+function drawMinimap(){
+  mctx.clearRect(0,0,154,154);mctx.fillStyle='#091132';mctx.fillRect(0,0,154,154);
+  const sx=154/MAP_W,sy=154/MAP_H;
+  mctx.fillStyle='#343852';for(const k of map.road){const [x,y]=k.split(',').map(Number);mctx.fillRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy))}
+  mctx.fillStyle='#256c4e';for(const k of map.parks){const [x,y]=k.split(',').map(Number);mctx.fillRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy))}
+  mctx.fillStyle='#ffd23c';mctx.fillRect(38*sx,18*sy,5,5);
+  mctx.fillStyle='#42e8ff';mctx.beginPath();mctx.arc(player.x*sx,player.y*sy,4,0,7);mctx.fill();
+}
+function loop(t){if(!running)return;const dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);draw();requestAnimationFrame(loop)}
+
+document.getElementById('dialogBox').addEventListener('click',closeNpcDialog);
+canvas.addEventListener('click',e=>{
+  if(!running)return;
+  const r=canvas.getBoundingClientRect();
+  const wx=(cam.x+e.clientX-r.left)/TILE;
+  const wy=(cam.y+e.clientY-r.top)/TILE;
+  const npc=npcAtWorld(wx,wy);
+  if(!npc)return;
+  if(isNpcNear(npc))openNpcDialog(npc);
+  else showToast('Chegue mais perto para conversar');
+});
+
+function setupTouch(){
+  const joy=document.getElementById('joy'),knob=document.getElementById('knob');let base=null;
+  joy.addEventListener('pointerdown',e=>{joy.setPointerCapture(e.pointerId);const r=joy.getBoundingClientRect();base={x:r.left+r.width/2,y:r.top+r.height/2};touch.active=true;moveJoy(e)});
+  joy.addEventListener('pointermove',moveJoy);joy.addEventListener('pointerup',()=>{touch.active=false;touch.x=touch.y=0;knob.style.left='50%';knob.style.top='50%'});
+  function moveJoy(e){if(!touch.active||!base)return;const dx=e.clientX-base.x,dy=e.clientY-base.y,d=Math.min(46,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);touch.x=Math.cos(a)*d/46;touch.y=Math.sin(a)*d/46;knob.style.left=`calc(50% + ${Math.cos(a)*d}px)`;knob.style.top=`calc(50% + ${Math.sin(a)*d}px)`}
+  [['btnA','a'],['btnB','b'],['btnX','xbtn']].forEach(([id,k])=>{const el=document.getElementById(id);el.addEventListener('pointerdown',e=>{e.preventDefault();touch[k]=true});el.addEventListener('pointerup',()=>touch[k]=false);el.addEventListener('pointerleave',()=>touch[k]=false)});
+}
+
+const startBtn=document.getElementById('startBtn');
+startBtn.onclick=async()=>{document.getElementById('start').classList.add('hidden');running=true;last=performance.now();requestAnimationFrame(loop)};
+loadAll().then(()=>{setupUI();setupTouch();draw();startBtn.disabled=false;startBtn.textContent='Jogar';}).catch(err=>{startBtn.textContent='Erro ao carregar assets';console.error(err)});
+</script>
+</body>
+</html>

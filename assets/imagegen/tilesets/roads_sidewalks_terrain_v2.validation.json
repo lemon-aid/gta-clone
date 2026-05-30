@@ -1,0 +1,105 @@
+{
+  "file": "D:\\cris\\ai gaming design\\GTA clone\\assets\\imagegen\\tilesets\\roads_sidewalks_terrain_v2.png",
+  "size": [
+    256,
+    256
+  ],
+  "edge_counts": {
+    "road_v": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "road_h": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "corner_rd": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "corner_ld": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "corner_ru": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "corner_lu": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "intersection": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "t_missing_up": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "crosswalk_v": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "crosswalk_h": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "sidewalk": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "t_missing_left": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "parking": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "parking_entrance": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "alley": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    },
+    "bike_lane": {
+      "top": 64,
+      "bottom": 64,
+      "left": 64,
+      "right": 64
+    }
+  }
+}

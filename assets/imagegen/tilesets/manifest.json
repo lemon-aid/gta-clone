@@ -1,0 +1,38 @@
+[
+  {
+    "file": "D:\\cris\\ai gaming design\\GTA clone\\assets\\imagegen\\tilesets\\building_facades_sheet.png",
+    "source": "ig_0b0c3e1c9cfbc3ee016a0110b2eefc81958f7050b5062ede8a.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true,
+    "grid": "4x4",
+    "cell_size": "64x64"
+  },
+  {
+    "file": "D:\\cris\\ai gaming design\\GTA clone\\assets\\imagegen\\tilesets\\park_street_props_sheet.png",
+    "source": "ig_0b0c3e1c9cfbc3ee016a01105c66b8819598b47780872eed14.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true,
+    "grid": "4x4",
+    "cell_size": "64x64"
+  },
+  {
+    "file": "D:\\cris\\ai gaming design\\GTA clone\\assets\\imagegen\\tilesets\\roads_sidewalks_sheet.png",
+    "source": "ig_0b0c3e1c9cfbc3ee016a010ffa56b8819596dbb47aabccb586.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "transparent_corners": true,
+    "grid": "4x4",
+    "cell_size": "64x64"
+  }
+]
