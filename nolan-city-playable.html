@@ -316,9 +316,12 @@ function setupUI(){
 }
 
 function pointInRect(x,y,r){return x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h}
+// So a parte de cima do predio colide. A faixa inferior (a "frente") fica passavel para o
+// personagem poder andar na frente do sprite, simulando profundidade (ele e desenhado por cima).
+const BUILDING_SOLID_TOP=0.55;
 function buildingRect(b){
   const bb=BUILDING_BOUNDS[b.index]||{x:0,y:0,w:BUILDING_CELL,h:BUILDING_CELL};
-  return {x:b.x+bb.x/TILE,y:b.y+bb.y/TILE,w:bb.w/TILE,h:bb.h/TILE};
+  return {x:b.x+bb.x/TILE,y:b.y+bb.y/TILE,w:bb.w/TILE,h:(bb.h*BUILDING_SOLID_TOP)/TILE};
 }
 function propRect(p){
   const d=PROP_BOUNDS[p.name]||{x:.2,y:.2,w:.6,h:.6};
