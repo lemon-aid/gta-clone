@@ -185,3 +185,32 @@ no membro e o do novo é carregado. Troca rápida pelas **teclas 1–4** ou bot�
 **Validado:** trocar p/ Mia muda sprite; refrigerante cura +15 e decrementa qtd; roubar carro
 em patrulha dá +1 procurado e ao sair fica parked; filtros de missão funcionam; 4 abas renderizam.
 Zero erros no console.
+
+---
+
+## 2026-05-31 — Garagem: carro ativo, comprar/vender, setinha no mapa
+
+Adicionada aba **Carros** no menu (5ª aba).
+
+**Modelo:** `CAR_CATALOG` (6 modelos compráveis: Compacto Azul, Hatch Verde, Táxi, Van,
+Ambulância, Viatura), `ownedCars[]` (garagem; começa com 1 Compacto Azul) e `activeCarIdx`.
+Um objeto único `myCar` (sempre `parked:true`, `owned:true`) é empurrado em `cars[]` e só
+aparece quando `myCar.active`.
+
+**Aba Carros:**
+- "Meus Carros" — cada carro com retrato, Ativar (define ativo) e Vender (50% do preço de volta;
+  não deixa vender o último).
+- "Loja de Carros" — catálogo com preço e Comprar (debita o dinheiro).
+
+**Carro ativo no mapa:** ao Ativar, `myCar` spawna no tile de rua mais próximo do player
+(`nearestRoadTile`), parado, com uma **setinha amarela** desenhada por cima (`drawCarArrow`,
+balança com sin do tempo). Entrar nele dá toast "Entrou no seu carro" e **não gera procurado**
+(porque `parked` → `roubo=false`). NPCs nunca patrulham o myCar (parked é pulado no loop).
+
+**Guards:** `nearestCar` e o loop de desenho pulam `myCar` quando `!active`.
+
+**Save/Load:** persiste `ownedCars`, `activeCarIdx` e `myCar.kind/active`.
+
+**Validado:** aba renderiza meus carros + loja; ativar coloca o carro com setinha na rua; usar
+o carro próprio mantém procurado em 0; comprar Táxi (-$1800) e vender (+$900 = 50%) corretos.
+Zero erros no console.

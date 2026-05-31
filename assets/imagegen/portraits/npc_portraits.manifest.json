@@ -1,0 +1,141 @@
+{
+  "source": "npc_portraits_source_green.png",
+  "atlas": "npc_portraits_atlas.png",
+  "portraitSize": [
+    256,
+    256
+  ],
+  "atlasGrid": [
+    3,
+    3
+  ],
+  "usage": "Bust portraits for dialogue boxes, NPC interactions, shop attendants, and contact/profile UI. Draw over UI panels; do not use as map sprites.",
+  "portraits": [
+    {
+      "name": "Luna",
+      "slug": "luna",
+      "kind": "hacker",
+      "path": "portraits/npc_portrait_luna.png",
+      "atlasIndex": 0,
+      "atlasCell": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "description": "Luna: hacker girl, purple bob hair, teal streaks, headphones, teal cyber hoodie"
+    },
+    {
+      "name": "Mia",
+      "slug": "mia",
+      "kind": "girl",
+      "path": "portraits/npc_portrait_mia.png",
+      "atlasIndex": 1,
+      "atlasCell": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "description": "Mia: teal-haired city girl, pink and blue streetwear"
+    },
+    {
+      "name": "Dani",
+      "slug": "dani",
+      "kind": "courier",
+      "path": "portraits/npc_portrait_dani.png",
+      "atlasIndex": 2,
+      "atlasCell": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "description": "Dani: food courier boy, orange cap, yellow-green jacket, delivery backpack"
+    },
+    {
+      "name": "Niko",
+      "slug": "niko",
+      "kind": "magician",
+      "path": "portraits/npc_portrait_niko.png",
+      "atlasIndex": 3,
+      "atlasCell": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "description": "Niko: street magician, silver hair, purple dark jacket"
+    },
+    {
+      "name": "Theo",
+      "slug": "theo",
+      "kind": "skate",
+      "path": "portraits/npc_portrait_theo.png",
+      "atlasIndex": 4,
+      "atlasCell": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "description": "Theo: skater kid, pink cap, blue hoodie"
+    },
+    {
+      "name": "Bit",
+      "slug": "bit",
+      "kind": "hacker",
+      "path": "portraits/npc_portrait_bit.png",
+      "atlasIndex": 5,
+      "atlasCell": [
+        512,
+        256,
+        256,
+        256
+      ],
+      "description": "Bit: hacker variant, purple hair, headphones, cyan glasses"
+    },
+    {
+      "name": "Rui",
+      "slug": "rui",
+      "kind": "courier",
+      "path": "portraits/npc_portrait_rui.png",
+      "atlasIndex": 6,
+      "atlasCell": [
+        0,
+        512,
+        256,
+        256
+      ],
+      "description": "Rui: courier variant, orange cap, yellow-green jacket"
+    },
+    {
+      "name": "Claudia",
+      "slug": "claudia",
+      "kind": "girl",
+      "path": "portraits/npc_portrait_claudia.png",
+      "atlasIndex": 7,
+      "atlasCell": [
+        256,
+        512,
+        256,
+        256
+      ],
+      "description": "Claudia: teal-haired girl variant, pink-blue outfit, shopkeeper-friendly smile"
+    },
+    {
+      "name": "Vince",
+      "slug": "vince",
+      "kind": "magician",
+      "path": "portraits/npc_portrait_vince.png",
+      "atlasIndex": 8,
+      "atlasCell": [
+        512,
+        512,
+        256,
+        256
+      ],
+      "description": "Vince: magician variant, silver hair, purple showman outfit"
+    }
+  ]
+}

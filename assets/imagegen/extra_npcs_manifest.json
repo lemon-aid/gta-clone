@@ -1,0 +1,368 @@
+{
+  "spriteSheetSize": [
+    256,
+    256
+  ],
+  "spriteCellSize": [
+    64,
+    64
+  ],
+  "portraitSize": [
+    256,
+    256
+  ],
+  "portraitAtlas": "portraits/extra_npc_portraits_atlas.png",
+  "portraitSource": "portraits/extra_npc_portraits_source_green.png",
+  "npcs": [
+    {
+      "name": "Dra. Ana",
+      "slug": "nurse_ana",
+      "role": "enfermeira",
+      "path": "people/npc_nurse_ana_spritesheet.png",
+      "base": "people/main_girl_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_nurse_ana.png",
+      "portraitAtlasIndex": 0,
+      "portraitAtlasCell": [
+        0,
+        0,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Rato",
+      "slug": "mechanic_rato",
+      "role": "mecanico",
+      "path": "people/npc_mechanic_rato_spritesheet.png",
+      "base": "people/food_courier_boy_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_mechanic_rato.png",
+      "portraitAtlasIndex": 1,
+      "portraitAtlasCell": [
+        256,
+        0,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Lis",
+      "slug": "florist_lis",
+      "role": "florista",
+      "path": "people/npc_florist_lis_spritesheet.png",
+      "base": "people/main_girl_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_florist_lis.png",
+      "portraitAtlasIndex": 2,
+      "portraitAtlasCell": [
+        512,
+        0,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Max",
+      "slug": "car_dealer_max",
+      "role": "vendedor de carros",
+      "path": "people/npc_car_dealer_max_spritesheet.png",
+      "base": "people/main_boy_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_car_dealer_max.png",
+      "portraitAtlasIndex": 3,
+      "portraitAtlasCell": [
+        768,
+        0,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Ze",
+      "slug": "arcade_ze",
+      "role": "atendente do arcade",
+      "path": "people/npc_arcade_ze_spritesheet.png",
+      "base": "people/skate_kid_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_arcade_ze.png",
+      "portraitAtlasIndex": 4,
+      "portraitAtlasCell": [
+        1024,
+        0,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Iris",
+      "slug": "police_iris",
+      "role": "policial",
+      "path": "people/npc_police_iris_spritesheet.png",
+      "base": "people/main_boy_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_police_iris.png",
+      "portraitAtlasIndex": 5,
+      "portraitAtlasCell": [
+        0,
+        256,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Bia",
+      "slug": "barista_bia",
+      "role": "barista",
+      "path": "people/npc_barista_bia_spritesheet.png",
+      "base": "people/main_girl_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_barista_bia.png",
+      "portraitAtlasIndex": 6,
+      "portraitAtlasCell": [
+        256,
+        256,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Sara",
+      "slug": "store_sara",
+      "role": "atendente de loja",
+      "path": "people/npc_store_sara_spritesheet.png",
+      "base": "people/main_girl_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_store_sara.png",
+      "portraitAtlasIndex": 7,
+      "portraitAtlasCell": [
+        512,
+        256,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Marcelo",
+      "slug": "taxi_marcelo",
+      "role": "taxista",
+      "path": "people/npc_taxi_marcelo_spritesheet.png",
+      "base": "people/food_courier_boy_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_taxi_marcelo.png",
+      "portraitAtlasIndex": 8,
+      "portraitAtlasCell": [
+        768,
+        256,
+        256,
+        256
+      ]
+    },
+    {
+      "name": "Sol",
+      "slug": "artist_sol",
+      "role": "artista de rua",
+      "path": "people/npc_artist_sol_spritesheet.png",
+      "base": "people/street_magician_imagegen.png",
+      "grid": [
+        4,
+        4
+      ],
+      "cellSize": [
+        64,
+        64
+      ],
+      "rows": [
+        "Down",
+        "Left",
+        "Right",
+        "Up"
+      ],
+      "columns": [
+        "Idle",
+        "Step Left",
+        "Idle",
+        "Step Right"
+      ],
+      "portrait": "portraits/npc_portrait_artist_sol.png",
+      "portraitAtlasIndex": 9,
+      "portraitAtlasCell": [
+        1024,
+        256,
+        256,
+        256
+      ]
+    }
+  ]
+}

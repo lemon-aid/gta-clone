@@ -36,7 +36,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
 .radio-sub{font-size:14px;color:#ccd6ff}
 #prompt{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);padding:12px 20px;border:2px solid #ffd33f;border-radius:10px;background:rgba(13,20,61,.92);font-weight:800;display:none}
 #toast{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);padding:12px 22px;border:2px solid #ff5dbf;border-radius:10px;background:rgba(13,20,61,.94);font-weight:900;display:none}
-#dialogBox{left:50%;bottom:26px;transform:translateX(-50%);width:min(560px,calc(100vw - 40px));padding:16px 18px;border-color:#ff5dbf;display:none;pointer-events:auto}
+#dialogBox{left:50%;bottom:26px;transform:translateX(-50%);width:min(660px,calc(100vw - 40px));padding:14px 16px;border-color:#ff5dbf;display:none;pointer-events:auto}
+#dialogContent{display:flex;align-items:flex-end;gap:16px}
+#dialogPortrait{width:118px;height:118px;flex:0 0 auto;object-fit:contain;filter:drop-shadow(0 0 14px rgba(60,222,255,.35))}
+#dialogCopy{flex:1;min-width:0;padding-bottom:2px}
 #dialogName{color:#ffd33f;font-size:18px;font-weight:900;margin-bottom:8px}
 #dialogText{font-size:16px;line-height:1.35;color:#f8f6ff}
 #dialogHint{margin-top:10px;font-size:12px;color:#9edfff;font-weight:800;text-align:right}
@@ -105,6 +108,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
   #radio{display:none}
   #shopInner{flex-direction:column;align-items:center;gap:8px}
   #shopKeeper{width:140px;height:140px}
+  #dialogPortrait{width:88px;height:88px}
+  #dialogContent{gap:10px}
 }
 </style>
 </head>
@@ -131,9 +136,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
   <div id="prompt">Pressione E para entrar no carro</div>
   <div id="toast"></div>
   <div id="dialogBox" class="panel">
-    <div id="dialogName"></div>
-    <div id="dialogText"></div>
-    <div id="dialogHint">E / clique para fechar</div>
+    <div id="dialogContent">
+      <img id="dialogPortrait" alt="">
+      <div id="dialogCopy">
+        <div id="dialogName"></div>
+        <div id="dialogText"></div>
+        <div id="dialogHint">E / clique para fechar</div>
+      </div>
+    </div>
   </div>
   <div id="controls">
     <div id="joy"><span class="sprite" id="joyBase"></span><span class="sprite" id="knob"></span></div>
@@ -186,6 +196,7 @@ const ASSETS={
   people:{boy:AS+'people/main_boy_imagegen.png',girl:AS+'people/main_girl_imagegen.png',hacker:AS+'people/hacker_girl_imagegen.png',courier:AS+'people/food_courier_boy_imagegen.png',magician:AS+'people/street_magician_imagegen.png',skate:AS+'people/skate_kid_imagegen.png'},
   cars:{taxi:AS+'cars/yellow_taxi_imagegen.png',blue:AS+'cars/blue_electric_compact_imagegen.png',green:AS+'cars/green_street_hatchback_imagegen.png',police:AS+'cars/black_blue_police_cruiser_imagegen.png',ambulance:AS+'cars/white_cyan_ambulance_van_imagegen.png',van:AS+'cars/purple_delivery_van_imagegen.png'},
   tiles:{props:AS+'tilesets/park_street_props_sheet.png',facades:AS+'tilesets/building_facades_96_sheet.png',sidewalkOverlay:AS+'tilesets/sidewalk_overlay_sheet.png'},
+  portraits:{luna:AS+'portraits/npc_portrait_luna.png',mia:AS+'portraits/npc_portrait_mia.png',dani:AS+'portraits/npc_portrait_dani.png',niko:AS+'portraits/npc_portrait_niko.png',theo:AS+'portraits/npc_portrait_theo.png',bit:AS+'portraits/npc_portrait_bit.png',rui:AS+'portraits/npc_portrait_rui.png',claudia:AS+'portraits/npc_portrait_claudia.png',vince:AS+'portraits/npc_portrait_vince.png'},
   ui:{touch:AS+'ui/touch_controls_sheet.png',hud:AS+'ui/hud_status_mission_sheet.png',inv:AS+'ui/inventory_items_sheet.png',panels:AS+'ui/panels_slots_frames_sheet.png'}
 };
 const img={};
@@ -273,6 +284,21 @@ const cars=[
   {kind:'ambulance',x:9,y:13,dir:'up',speed:1.8,path:'v',lane:9},
   {kind:'van',x:35,y:13,dir:'down',speed:1.3,path:'v',lane:35}
 ];
+// Carro proprio do jogador (garagem). Sempre parked (sem punicao ao usar) e nunca patrulha.
+// So aparece no mapa quando ha um carro ativo (myCar.active).
+const myCar={kind:'blue',x:0,y:0,dir:'down',vx:0,vy:0,parked:true,owned:true,active:false};
+cars.push(myCar);
+// Catalogo da loja de carros e garagem do jogador
+const CAR_CATALOG=[
+  {kind:'blue',name:'Compacto Azul',price:1200},
+  {kind:'green',name:'Hatch Verde',price:1500},
+  {kind:'taxi',name:'Taxi Amarelo',price:1800},
+  {kind:'van',name:'Van Roxa',price:2200},
+  {kind:'ambulance',name:'Ambulancia',price:3000},
+  {kind:'police',name:'Viatura',price:4000}
+];
+let ownedCars=[{kind:'blue',name:'Compacto Azul',price:1200}]; // carro inicial
+let activeCarIdx=-1;
 const npcs=[
   {kind:'hacker',x:2,y:3,dir:'down',name:'Luna',lines:['As cameras estao limpas por enquanto.','Se precisar abrir um portao, e so me chamar.']},
   {kind:'girl',x:24,y:10,dir:'left',name:'Mia',lines:['Vi um carro suspeito perto do cafe.','Ele seguiu pela avenida principal, na pista da direita.']},
@@ -399,10 +425,17 @@ function npcLines(n){
   const data=NPC_DIALOG[n.kind];
   return data?[data.text]:['Oi! A cidade ainda esta ganhando vida.'];
 }
+function portraitSlugFor(name,kind){
+  const slug=(name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+  if(ASSETS.portraits[slug])return slug;
+  return {hacker:'luna',girl:'mia',courier:'dani',magician:'niko',skate:'theo'}[kind]||'mia';
+}
 function openNpcDialog(n){
   activeDialog=n;n._line=0;
   const lines=npcLines(n);
-  document.getElementById('dialogName').textContent=n.name||(NPC_DIALOG[n.kind]&&NPC_DIALOG[n.kind].name)||'Morador';
+  const name=n.name||(NPC_DIALOG[n.kind]&&NPC_DIALOG[n.kind].name)||'Morador';
+  document.getElementById('dialogName').textContent=name;
+  document.getElementById('dialogPortrait').src=cb(ASSETS.portraits[portraitSlugFor(name,n.kind)]);
   document.getElementById('dialogText').textContent=lines[0];
   document.getElementById('dialogHint').textContent=lines.length>1?'E / clique para continuar':'E / clique para fechar';
   document.getElementById('dialogBox').style.display='block';
@@ -470,11 +503,11 @@ function nearestShop(){
 }
 function setKeeperPortrait(kind){
   const el=document.getElementById('shopKeeper');
-  const src=ASSETS.people[kind]||ASSETS.people.girl;
-  const scale=240/64;
+  const src=ASSETS.portraits[{girl:'claudia',courier:'dani',magician:'niko',skate:'theo',hacker:'luna'}[kind]||'mia'];
   el.style.backgroundImage=`url("${cb(src)}")`;
-  el.style.backgroundSize=`${256*scale}px ${256*scale}px`;
-  el.style.backgroundPosition='0px 0px';
+  el.style.backgroundSize='contain';
+  el.style.backgroundPosition='center bottom';
+  el.style.backgroundRepeat='no-repeat';
 }
 function openShop(b){
   const def=SHOPS[b.name];if(!def)return;
@@ -546,11 +579,11 @@ function setKindPortrait(el,kind){
 }
 function renderMenu(){
   if(!menuOpen)return;
-  const tabs=[['inv','Inventário'],['quests','Missões'],['wanted','Procurado'],['party','Party']];
+  const tabs=[['inv','Inventário'],['quests','Missões'],['cars','Carros'],['wanted','Procurado'],['party','Party']];
   const nav=document.getElementById('menuTabs');nav.innerHTML='';
   tabs.forEach(([k,lbl])=>{const b=document.createElement('button');b.textContent=lbl;if(k===menuTab)b.className='active';b.onclick=()=>{menuTab=k;renderMenu()};nav.appendChild(b)});
   const body=document.getElementById('menuBody');body.innerHTML='';
-  ({inv:renderInvBody,quests:renderQuestBody,wanted:renderWantedBody,party:renderPartyBody}[menuTab]||renderInvBody)(body);
+  ({inv:renderInvBody,quests:renderQuestBody,cars:renderCarsBody,wanted:renderWantedBody,party:renderPartyBody}[menuTab]||renderInvBody)(body);
 }
 function menuTitle(body,txt){const t=document.createElement('div');t.className='menuTitle';t.textContent=txt;body.appendChild(t)}
 function renderInvBody(body){
@@ -611,6 +644,66 @@ function renderPartyBody(body){
   body.appendChild(hint);
 }
 
+// ===== Garagem / Carros =====
+function setCarPortrait(el,kind){
+  const src=ASSETS.cars[kind]||ASSETS.cars.blue,scale=72/64;
+  el.style.backgroundImage=`url("${cb(src)}")`;
+  el.style.backgroundSize=`${256*scale}px ${256*scale}px`;
+  el.style.backgroundPosition='0px 0px';
+}
+function nearestRoadTile(px,py){
+  let best=null,bd=1e9;
+  for(const k of map.road){const [x,y]=k.split(',').map(Number);const d=Math.hypot(x+0.5-px,y+0.5-py);if(d<bd){bd=d;best=[x,y]}}
+  return best;
+}
+function spawnMyCar(){
+  const t=nearestRoadTile(player.x,player.y)||[3,5];
+  myCar.x=t[0];myCar.y=t[1];myCar.dir='down';myCar.vx=0;myCar.vy=0;myCar.parked=true;myCar.active=true;
+}
+function setActiveCar(i){
+  if(i<0||i>=ownedCars.length)return;
+  activeCarIdx=i;myCar.kind=ownedCars[i].kind;spawnMyCar();
+  renderMenu();showToast(ownedCars[i].name+' está ativo no mapa');
+}
+function buyCar(cat){
+  if(player.cash<cat.price){showToast('Dinheiro insuficiente');return}
+  player.cash-=cat.price;
+  ownedCars.push({kind:cat.kind,name:cat.name,price:cat.price});
+  updateHUD();renderMenu();showToast('Comprou '+cat.name+'!');
+}
+function sellCar(i){
+  if(i<0||i>=ownedCars.length)return;
+  if(ownedCars.length<=1){showToast('Voce precisa manter ao menos 1 carro');return}
+  const refund=Math.floor(ownedCars[i].price*0.5);
+  const name=ownedCars[i].name;
+  ownedCars.splice(i,1);
+  if(i===activeCarIdx){activeCarIdx=-1;myCar.active=false;if(player.inCar===myCar)player.inCar=null}
+  else if(i<activeCarIdx){activeCarIdx--}
+  player.cash+=refund;updateHUD();renderMenu();showToast('Vendeu '+name+' (+$'+refund+')');
+}
+function renderCarsBody(body){
+  menuTitle(body,'Meus Carros');
+  ownedCars.forEach((c,i)=>{
+    const row=document.createElement('div');row.className='partyItem';
+    const p=document.createElement('div');p.className='portrait sprite';setCarPortrait(p,c.kind);
+    const main=document.createElement('div');main.className='itemMain';
+    main.innerHTML=`<div class="nm">${c.name} ${i===activeCarIdx?'<span class="badge active">Ativo</span>':''}</div><div class="sub">Revenda: $${Math.floor(c.price*0.5)}</div>`;
+    const wrap=document.createElement('div');wrap.style.cssText='display:flex;gap:8px';
+    const aBtn=document.createElement('button');aBtn.className='menuBtn'+(i===activeCarIdx?' active':'');aBtn.textContent=i===activeCarIdx?'Ativo':'Ativar';aBtn.disabled=i===activeCarIdx;aBtn.onclick=()=>setActiveCar(i);
+    const sBtn=document.createElement('button');sBtn.className='menuBtn';sBtn.style.borderColor='#ff5dbf';sBtn.style.background='#3a1230';sBtn.textContent='Vender';sBtn.onclick=()=>sellCar(i);
+    wrap.append(aBtn,sBtn);row.append(p,main,wrap);body.appendChild(row);
+  });
+  const sub=document.createElement('div');sub.className='menuTitle';sub.style.marginTop='18px';sub.textContent='Loja de Carros';body.appendChild(sub);
+  CAR_CATALOG.forEach(cat=>{
+    const row=document.createElement('div');row.className='partyItem';
+    const p=document.createElement('div');p.className='portrait sprite';setCarPortrait(p,cat.kind);
+    const main=document.createElement('div');main.className='itemMain';
+    main.innerHTML=`<div class="nm">${cat.name}</div><div class="sub">$${cat.price}</div>`;
+    const btn=document.createElement('button');btn.className='menuBtn';btn.textContent='Comprar';btn.disabled=player.cash<cat.price;btn.onclick=()=>buyCar(cat);
+    row.append(p,main,btn);body.appendChild(row);
+  });
+}
+
 // ---- Save / Load ----
 const SAVE_KEY='nolan_city_save_v1';
 function saveGame(){
@@ -620,6 +713,7 @@ function saveGame(){
     cars:cars.map(c=>({x:c.x,y:c.y,dir:c.dir,vx:c.vx||0,vy:c.vy||0,parked:!!c.parked})),
     questIndex,questProg:(currentQuest()&&currentQuest().goal!=null)?currentQuest().prog:0,
     inventory,party:PARTY.map(m=>({hp:m.hp})),activeMember,
+    ownedCars,activeCarIdx,myCar:{kind:myCar.kind,active:myCar.active},
     ts:Date.now()
   };
   try{localStorage.setItem(SAVE_KEY,JSON.stringify(data));showToast('Jogo salvo!')}
@@ -639,6 +733,9 @@ function loadGame(){
     if(Array.isArray(d.party))d.party.forEach((m,i)=>{if(PARTY[i])PARTY[i].hp=m.hp});
     if(typeof d.activeMember==='number')activeMember=d.activeMember;
     player.hp=PARTY[activeMember].hp;
+    if(Array.isArray(d.ownedCars))ownedCars=d.ownedCars;
+    if(typeof d.activeCarIdx==='number')activeCarIdx=d.activeCarIdx;
+    if(d.myCar){myCar.kind=d.myCar.kind||myCar.kind;myCar.active=!!d.myCar.active}
     closeShop();closeNpcDialog();
     updateHUD();renderQuest();
     showToast('Jogo carregado!');
@@ -667,7 +764,7 @@ function ensurePlayerSpawnClear(){
 ensurePlayerSpawnClear();
 function nearestCar(){
   let best=null,bd=999;
-  for(const c of cars){const d=Math.hypot(c.x-player.x,c.y-player.y);if(d<bd){bd=d;best=c}}
+  for(const c of cars){if(c===myCar&&!myCar.active)continue;const d=Math.hypot(c.x-player.x,c.y-player.y);if(d<bd){bd=d;best=c}}
   return bd<1.15?best:null;
 }
 // Carro so pode ocupar tiles de estrada. Como toda calcada/predio/grama nao e
@@ -751,10 +848,10 @@ function update(dt){
       if(npc)openNpcDialog(npc);
       else if(shop)openShop(shop);
       else if(car){
-        const roubo=!car.parked; // carro em patrulha = roubo; carro que voce estacionou = seu
+        const roubo=!car.parked; // carro em patrulha = roubo; carro que voce estacionou ou seu carro = sem punicao
         player.inCar=car;car.vx=0;car.vy=0;
         if(roubo){player.wanted=Math.min(5,player.wanted+1);updateHUD();showToast('Carro roubado! Procurado +1')}
-        else showToast('Entrou no veiculo');
+        else showToast(car===myCar?'Entrou no seu carro':'Entrou no veiculo');
         questEvent('drive_enter');
       }
     }
@@ -866,6 +963,12 @@ function roundRect(x,y,w,h,r,fill,stroke){
   }
   if(fill)ctx.fill();if(stroke)ctx.stroke()
 }
+function drawCarArrow(){
+  if(!myCar.active||player.inCar===myCar)return;
+  const px=myCar.x*TILE-cam.x+TILE/2, py=myCar.y*TILE-cam.y-6+Math.sin(performance.now()/250)*4;
+  ctx.fillStyle='#ffd23c';ctx.strokeStyle='#0a0820';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(px-9,py-16);ctx.lineTo(px+9,py-16);ctx.lineTo(px,py-3);ctx.closePath();ctx.fill();ctx.stroke();
+}
 function draw(){
   ctx.clearRect(0,0,W,H);
   const x0=Math.floor(cam.x/TILE)-1,y0=Math.floor(cam.y/TILE)-1,x1=Math.ceil((cam.x+W)/TILE)+1,y1=Math.ceil((cam.y+H)/TILE)+1;
@@ -874,7 +977,8 @@ function draw(){
   const propImg=img[ASSETS.tiles.props],facImg=img[ASSETS.tiles.facades];
   for(const b of map.buildings)drawBuilding(b)
   for(const p of map.props){const s=sheet(ASSETS.tiles.props,Math.floor(p.index/4),p.index%4);drawSheet(s,p.x*TILE-cam.x,p.y*TILE-cam.y)}
-  for(const c of cars){drawSheet(sheet(ASSETS.cars[c.kind],dirRow(c.dir),0),c.x*TILE-cam.x,c.y*TILE-cam.y)}
+  for(const c of cars){if(c===myCar&&!myCar.active)continue;drawSheet(sheet(ASSETS.cars[c.kind],dirRow(c.dir),0),c.x*TILE-cam.x,c.y*TILE-cam.y)}
+  drawCarArrow();
   for(const n of npcs){drawSheet(sheet(ASSETS.people[n.kind],dirRow(n.dir),0),n.x*TILE-cam.x,n.y*TILE-cam.y)}
   if(!player.inCar){
     const col=Math.floor(player.anim)%4;

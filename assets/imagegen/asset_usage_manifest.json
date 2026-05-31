@@ -43,6 +43,30 @@
       "rule": "Parking slot must be at least largest car bbox plus 14px padding on each axis total."
     }
   },
+  "portraits": {
+    "usage": "Bust portraits for dialogue boxes, NPC interaction UI, shop attendants, contact/profile UI, and menu panels. These are UI assets only; do not place them on the world map.",
+    "atlas": "portraits/npc_portraits_atlas.png",
+    "manifest": "portraits/npc_portraits.manifest.json",
+    "portraitSize": [256, 256],
+    "paths": {
+      "Luna": "portraits/npc_portrait_luna.png",
+      "Mia": "portraits/npc_portrait_mia.png",
+      "Dani": "portraits/npc_portrait_dani.png",
+      "Niko": "portraits/npc_portrait_niko.png",
+      "Theo": "portraits/npc_portrait_theo.png",
+      "Bit": "portraits/npc_portrait_bit.png",
+      "Rui": "portraits/npc_portrait_rui.png",
+      "Claudia": "portraits/npc_portrait_claudia.png",
+      "Vince": "portraits/npc_portrait_vince.png"
+    },
+    "shopFallbackByKind": {
+      "girl": "portraits/npc_portrait_claudia.png",
+      "courier": "portraits/npc_portrait_dani.png",
+      "magician": "portraits/npc_portrait_niko.png",
+      "skate": "portraits/npc_portrait_theo.png",
+      "hacker": "portraits/npc_portrait_luna.png"
+    }
+  },
   "tilesets": {
     "roads": {
       "paths": [
