@@ -1,0 +1,272 @@
+{
+  "tileSize": 64,
+  "sheetSize": [
+    256,
+    256
+  ],
+  "grid": [
+    4,
+    4
+  ],
+  "tiles": {
+    "0": "floor_base_walkable",
+    "1": "floor_accent_walkable",
+    "2": "top_wall_solid",
+    "3": "decor_wall_solid",
+    "4": "counter_left_solid_overlay",
+    "5": "counter_mid_solid_overlay",
+    "6": "counter_right_solid_overlay",
+    "7": "service_counter_front_solid_overlay",
+    "8": "shelf_a_solid_overlay",
+    "9": "shelf_b_solid_overlay",
+    "10": "shelf_c_solid_overlay",
+    "11": "signature_prop_solid_overlay",
+    "12": "entrance_door_walkable",
+    "13": "rug_or_service_path_walkable",
+    "14": "secondary_prop_solid_overlay",
+    "15": "tool_or_special_prop_solid_overlay"
+  },
+  "layoutRules": {
+    "roomRecommendedSizeTiles": [
+      9,
+      7
+    ],
+    "counterRule": "Place counter tiles as a 3 tile wide horizontal barrier near the back wall; attendant stands behind it, player stands in front on floor/rug.",
+    "collision": "Tiles containing wall, counter, shelf, signature_prop, secondary_prop, or special_prop are solid. floor, door, and rug are walkable.",
+    "interaction": "Shop interaction trigger should be one tile in front of the service_counter_front or counter_mid tile.",
+    "rendering": "Draw floor/wall base first, then overlay counter and prop cells. Use the same 64x64 grid for collision."
+  },
+  "shops": [
+    {
+      "id": "store",
+      "title": "Mercado Nolan",
+      "attendant": "Sara",
+      "path": "tilesets/shops/shop_store_interior_tileset.png",
+      "paletteRole": "store",
+      "recommendedCounterCells": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walkableCells": [
+        0,
+        1,
+        12,
+        13
+      ],
+      "solidCells": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "cafe",
+      "title": "Cafe Aurora",
+      "attendant": "Bia",
+      "path": "tilesets/shops/shop_cafe_interior_tileset.png",
+      "paletteRole": "cafe",
+      "recommendedCounterCells": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walkableCells": [
+        0,
+        1,
+        12,
+        13
+      ],
+      "solidCells": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "mechanic",
+      "title": "Oficina do Rato",
+      "attendant": "Rato",
+      "path": "tilesets/shops/shop_mechanic_interior_tileset.png",
+      "paletteRole": "mechanic",
+      "recommendedCounterCells": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walkableCells": [
+        0,
+        1,
+        12,
+        13
+      ],
+      "solidCells": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "flower",
+      "title": "Floricultura Lis",
+      "attendant": "Lis",
+      "path": "tilesets/shops/shop_flower_interior_tileset.png",
+      "paletteRole": "flower",
+      "recommendedCounterCells": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walkableCells": [
+        0,
+        1,
+        12,
+        13
+      ],
+      "solidCells": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "hospital",
+      "title": "Hospital Central",
+      "attendant": "Dra. Ana",
+      "path": "tilesets/shops/shop_hospital_interior_tileset.png",
+      "paletteRole": "hospital",
+      "recommendedCounterCells": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walkableCells": [
+        0,
+        1,
+        12,
+        13
+      ],
+      "solidCells": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "arcade",
+      "title": "Arcade Neon",
+      "attendant": "Ze",
+      "path": "tilesets/shops/shop_arcade_interior_tileset.png",
+      "paletteRole": "arcade",
+      "recommendedCounterCells": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walkableCells": [
+        0,
+        1,
+        12,
+        13
+      ],
+      "solidCells": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "car_dealer",
+      "title": "Nolan Motors",
+      "attendant": "Max",
+      "path": "tilesets/shops/shop_car_dealer_interior_tileset.png",
+      "paletteRole": "dealer",
+      "recommendedCounterCells": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "walkableCells": [
+        0,
+        1,
+        12,
+        13
+      ],
+      "solidCells": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    }
+  ]
+}

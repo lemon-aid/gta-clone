@@ -237,3 +237,24 @@ Atualiza sozinho a cada push no master (~1min). Repo é público (requisito do P
 
 Observação: rAF é pausado em aba de segundo plano — o feedback dos botões só "anima" com a aba
 em foco (no tablet do usuário roda normal). Verificado chamando updateButtonStates direto.
+
+---
+
+## 2026-05-31 — Estacionamento (parking_lot_tileset)
+
+Adicionado `assets/imagegen/tilesets/parking_lot_tileset.png` (4×4, 64px: asfalto, vagas
+cima/baixo, acessível, guias/curbs, canteiros, driveway, cantos, símbolo P, cancela).
+
+**Onde:** bloco central-inferior, `LX=11,LY=17,LW=9,LH=7` (x11–19, y17–23), entre as ruas
+row16 e row25 / col9 e col22. A linha de cima encosta na rua row16; entrada (driveway) nas
+colunas x14–16.
+
+**Como:** `buildParkingLot()` preenche `map.parkingCells` (Map tile→índice) e `map.parkingDrive`
+(Set de células onde carro pode andar). Guias/cantos na borda (bloqueiam o carro), interior +
+entrada driváveis, vaga acessível e símbolo "P" como detalhes. Render via `drawParkingCell`
+(base asfalto + tile). `carBlocked` agora permite `isRoad || parkingDrive`, então dá pra entrar
+de carro pela rua e estacionar nas vagas; as guias contêm o carro (só a entrada conecta).
+Pedestre anda livre (não entra em solidAt). Aparece em cinza no minimapa.
+
+**Validado:** lot renderiza no bloco; carBlocked false em entrada/interior/vagas e true em
+guias/fora; rua acima conecta. Zero erros no console.
