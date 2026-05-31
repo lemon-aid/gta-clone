@@ -18,7 +18,17 @@
       "people/hacker_girl_imagegen.png",
       "people/food_courier_boy_imagegen.png",
       "people/street_magician_imagegen.png",
-      "people/skate_kid_imagegen.png"
+      "people/skate_kid_imagegen.png",
+      "people/npc_nurse_ana_spritesheet.png",
+      "people/npc_mechanic_rato_spritesheet.png",
+      "people/npc_florist_lis_spritesheet.png",
+      "people/npc_car_dealer_max_spritesheet.png",
+      "people/npc_arcade_ze_spritesheet.png",
+      "people/npc_police_iris_spritesheet.png",
+      "people/npc_barista_bia_spritesheet.png",
+      "people/npc_store_sara_spritesheet.png",
+      "people/npc_taxi_marcelo_spritesheet.png",
+      "people/npc_artist_sol_spritesheet.png"
     ]
   },
   "cars": {
@@ -46,7 +56,9 @@
   "portraits": {
     "usage": "Bust portraits for dialogue boxes, NPC interaction UI, shop attendants, contact/profile UI, and menu panels. These are UI assets only; do not place them on the world map.",
     "atlas": "portraits/npc_portraits_atlas.png",
+    "extraAtlas": "portraits/extra_npc_portraits_atlas.png",
     "manifest": "portraits/npc_portraits.manifest.json",
+    "extraManifest": "extra_npcs_manifest.json",
     "portraitSize": [256, 256],
     "paths": {
       "Luna": "portraits/npc_portrait_luna.png",
@@ -57,7 +69,17 @@
       "Bit": "portraits/npc_portrait_bit.png",
       "Rui": "portraits/npc_portrait_rui.png",
       "Claudia": "portraits/npc_portrait_claudia.png",
-      "Vince": "portraits/npc_portrait_vince.png"
+      "Vince": "portraits/npc_portrait_vince.png",
+      "Dra. Ana": "portraits/npc_portrait_nurse_ana.png",
+      "Rato": "portraits/npc_portrait_mechanic_rato.png",
+      "Lis": "portraits/npc_portrait_florist_lis.png",
+      "Max": "portraits/npc_portrait_car_dealer_max.png",
+      "Ze": "portraits/npc_portrait_arcade_ze.png",
+      "Iris": "portraits/npc_portrait_police_iris.png",
+      "Bia": "portraits/npc_portrait_barista_bia.png",
+      "Sara": "portraits/npc_portrait_store_sara.png",
+      "Marcelo": "portraits/npc_portrait_taxi_marcelo.png",
+      "Sol": "portraits/npc_portrait_artist_sol.png"
     },
     "shopFallbackByKind": {
       "girl": "portraits/npc_portrait_claudia.png",
