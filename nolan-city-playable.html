@@ -299,32 +299,16 @@ function buildMap(){
   for(let x=37;x<42;x++)for(let y=18;y<21;y++)map.parking.push({x,y});
 }
 buildMap();
-// Estacionamento no bloco central-inferior (entre as ruas row16 e row25, col9 e col22).
-// A linha de cima encosta na rua (row16), com entrada por algumas colunas (driveway).
+// Estacionamento no bloco central-inferior (entre row16/row25 e col9/col22).
+// Desenhado proceduralmente (asfalto plano + faixas pintadas) para ficar limpo como as referencias.
+// Layout: vagas em cima (2 fileiras), corredor central, vagas embaixo (2 fileiras).
+const PLOT={x:11,y:17,w:10,h:7}; // x11..20, y17..23
 function buildParkingLot(){
-  const LX=11,LY=17,LW=9,LH=7,ENT=[14,15,16];
-  for(let cy=0;cy<LH;cy++)for(let cx=0;cx<LW;cx++){
-    const x=LX+cx,y=LY+cy,k=key(x,y);
-    const top=cy===0,bottom=cy===LH-1,left=cx===0,right=cx===LW-1;
-    let idx,drive=false;
-    if(top&&ENT.includes(x)){idx=10;drive=true;}      // entrada (driveway)
-    else if(top&&left)idx=12;                          // canto sup. esq.
-    else if(top&&right)idx=13;                         // canto sup. dir.
-    else if(top)idx=4;                                 // guia superior
-    else if(bottom)idx=5;                              // guia inferior
-    else if(left)idx=8;                                // guia esquerda
-    else if(right)idx=9;                               // guia direita
-    else{ drive=true;                                  // interior (drivável)
-      if(ENT.includes(x))idx=10;                       // faixa de circulação
-      else if(cy===1)idx=2;                            // vagas viradas p/ baixo
-      else if(cy===LH-2)idx=1;                         // vagas viradas p/ cima
-      else idx=0;                                      // asfalto
-    }
-    map.parkingCells.set(k,idx);
-    if(drive)map.parkingDrive.add(k);
+  for(let cy=0;cy<PLOT.h;cy++)for(let cx=0;cx<PLOT.w;cx++){
+    const k=key(PLOT.x+cx,PLOT.y+cy);
+    map.parkingCells.set(k,0);  // marca como asfalto de estacionamento
+    map.parkingDrive.add(k);    // todo o lote e dirigivel; topo encosta na rua row16 (entrada)
   }
-  map.parkingCells.set(key(LX+1,LY+1),3);              // vaga acessível
-  map.parkingCells.set(key(LX+LW-2,LY+1),14);          // símbolo "P"
 }
 buildParkingLot();
 
@@ -959,9 +943,48 @@ function drawPavement(x,y){
 }
 function drawParkingCell(x,y){
   const px=x*TILE-cam.x,py=y*TILE-cam.y;
-  ctx.fillStyle='#2a2d3f';ctx.fillRect(px,py,TILE,TILE); // base asfalto (caso o tile tenha transparencia)
-  const idx=map.parkingCells.get(key(x,y));
-  drawSheet(sheet(ASSETS.tiles.parking,Math.floor(idx/4),idx%4),px,py);
+  ctx.fillStyle='#4b4e5a';ctx.fillRect(px,py,TILE,TILE); // asfalto cinza plano
+}
+function drawParkingMarkings(){
+  const T=TILE,ox=-cam.x,oy=-cam.y;
+  const X=PLOT.x*T+ox,Y=PLOT.y*T+oy,Wd=PLOT.w*T,Ht=PLOT.h*T;
+  if(X>W||Y>H||X+Wd<0||Y+Ht<0)return; // fora da tela
+  const topY0=Y, topY1=(PLOT.y+2)*T+oy;        // vagas de cima: y17-18
+  const botY0=(PLOT.y+5)*T+oy, botY1=Y+Ht;     // vagas de baixo: y22-23
+  const midY=(PLOT.y+3.5)*T+oy;                 // centro do corredor
+  ctx.save();
+  // guia/curb da borda
+  ctx.strokeStyle='#9a96b8';ctx.lineWidth=4;ctx.strokeRect(X+2,Y+2,Wd-4,Ht-4);
+  // vagas acessiveis (2 ultimas vagas de cima) - realce azul
+  ctx.fillStyle='rgba(40,120,225,.45)';
+  for(let i=PLOT.w-2;i<PLOT.w;i++)ctx.fillRect((PLOT.x+i)*T+ox+4,topY0+5,T-8,(topY1-topY0)-7);
+  // linhas das vagas (amarelo)
+  ctx.strokeStyle='#f2c21a';ctx.lineWidth=3;ctx.lineCap='round';
+  for(let i=1;i<PLOT.w;i++){
+    const lx=(PLOT.x+i)*T+ox;
+    ctx.beginPath();ctx.moveTo(lx,topY0+6);ctx.lineTo(lx,topY1);ctx.stroke();   // divisorias vagas topo
+    ctx.beginPath();ctx.moveTo(lx,botY0);ctx.lineTo(lx,botY1-6);ctx.stroke();   // divisorias vagas baixo
+  }
+  // linha de frente das vagas (limite com o corredor)
+  ctx.beginPath();ctx.moveTo(X+6,topY1);ctx.lineTo(X+Wd-6,topY1);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X+6,botY0);ctx.lineTo(X+Wd-6,botY0);ctx.stroke();
+  // corredor central: tracejado branco
+  ctx.strokeStyle='#e9ecff';ctx.lineWidth=3;ctx.setLineDash([20,16]);
+  ctx.beginPath();ctx.moveTo(X+12,midY);ctx.lineTo(X+Wd-12,midY);ctx.stroke();
+  ctx.setLineDash([]);
+  // setas de entrada (apontando p/ baixo) no topo-centro
+  ctx.fillStyle='#e9ecff';
+  for(const ax of [PLOT.x+4.5,PLOT.x+5.5]){
+    const cxp=ax*T+ox, ty=Y-2;
+    ctx.beginPath();ctx.moveTo(cxp-7,ty);ctx.lineTo(cxp+7,ty);ctx.lineTo(cxp,ty+11);ctx.closePath();ctx.fill();
+  }
+  // placa "P"
+  const sx=X+18, sy=midY;
+  ctx.fillStyle='#1b8cff';ctx.strokeStyle='#fff';ctx.lineWidth=3;
+  roundRect(sx-15,sy-17,30,34,5,true,true);
+  ctx.fillStyle='#fff';ctx.font='900 22px Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('P',sx,sy+1);
+  ctx.restore();
 }
 function drawRoad(x,y){
   const px=x*TILE-cam.x,py=y*TILE-cam.y;
@@ -1067,7 +1090,7 @@ function draw(){
   ctx.clearRect(0,0,W,H);
   const x0=Math.floor(cam.x/TILE)-1,y0=Math.floor(cam.y/TILE)-1,x1=Math.ceil((cam.x+W)/TILE)+1,y1=Math.ceil((cam.y+H)/TILE)+1;
   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){if(x<0||y<0||x>=MAP_W||y>=MAP_H)continue;const k=key(x,y);if(map.parks.has(k))drawGrass(x,y);else if(isRoad(x,y))drawRoad(x,y);else if(map.parkingCells.has(k))drawParkingCell(x,y);else drawPavement(x,y)}
-  drawSidewalkOverlays();drawLaneLines();drawCrosswalks();
+  drawSidewalkOverlays();drawLaneLines();drawCrosswalks();drawParkingMarkings();
   const propImg=img[ASSETS.tiles.props],facImg=img[ASSETS.tiles.facades];
   for(const b of map.buildings)drawBuilding(b)
   for(const p of map.props){const s=sheet(ASSETS.tiles.props,Math.floor(p.index/4),p.index%4);drawSheet(s,p.x*TILE-cam.x,p.y*TILE-cam.y)}

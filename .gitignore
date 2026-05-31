@@ -1,0 +1,5 @@
+# Pacotes de assets pagos / pesados — mantidos só localmente, não vão pro repo nem pro GitHub Pages
+assets/paid/
+
+# Zips de assets
+*.zip

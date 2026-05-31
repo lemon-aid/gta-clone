@@ -258,3 +258,14 @@ Pedestre anda livre (não entra em solidAt). Aparece em cinza no minimapa.
 
 **Validado:** lot renderiza no bloco; carBlocked false em entrada/interior/vagas e true em
 guias/fora; rua acima conecta. Zero erros no console.
+
+### Revisão (mesma data) — render procedural
+O 1º render usando os TILES do `parking_lot_tileset.png` ficou ruim (blocos roxos desconexos,
+corredor tipo "rua"). O usuário pediu p/ aproximar das referências (asfalto cinza + linhas finas).
+**Trocado para desenho procedural no canvas** (`drawParkingMarkings`), ignorando o tileset:
+- `drawParkingCell` = asfalto cinza plano (#4b4e5a).
+- Marcações pintadas: vagas (linhas amarelas) em 2 fileiras (topo y17-18, base y22-23),
+  corredor central com tracejado branco, guia/curb na borda, 2 vagas acessíveis (azul),
+  placa "P" e setas de entrada no topo.
+- `PLOT={x:11,y:17,w:10,h:7}`; todo o lote é dirigível; topo encosta na rua row16.
+O tileset PNG continua registrado em ASSETS.tiles.parking mas não é mais desenhado.
