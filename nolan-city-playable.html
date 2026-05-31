@@ -2,7 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#070718">
 <title>Nolan City - Playable Prototype</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -52,10 +56,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
 #btnB{right:34px;bottom:112px}
 #pauseBtn{position:absolute;right:92px;top:24px;width:52px;height:52px;pointer-events:auto}
 #settingsBtn{position:absolute;right:24px;top:24px;width:52px;height:52px;pointer-events:auto}
+/* feedback visual quando um botao esta sendo usado (toque ou tecla) */
+.btn,#pauseBtn,#settingsBtn,#joyBase,#knob{transition:filter .06s,transform .06s}
+.btn.pressed,#pauseBtn.pressed,#settingsBtn.pressed{filter:brightness(1.5) drop-shadow(0 0 12px #3cdeff);transform:scale(.88)}
+#joy.pressed #joyBase{filter:brightness(1.35) drop-shadow(0 0 12px #3cdeff)}
+.btnlabel{position:absolute;left:50%;top:-13px;transform:translateX(-50%);font-size:10px;font-weight:900;color:#cfe9ff;text-shadow:0 0 4px #000,0 0 4px #000;pointer-events:none;letter-spacing:.4px;white-space:nowrap}
 #start{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at 50% 40%,#231055,#070718);z-index:20}
 #start h1{font-size:54px;letter-spacing:1px;color:#fff;text-shadow:0 0 20px #ff5dbf;margin-bottom:8px}
 #start p{color:#ccd6ff;margin-bottom:24px}
 #start button{pointer-events:auto;padding:14px 28px;border-radius:10px;border:2px solid #3cdeff;background:#0d143d;color:#fff;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 0 24px rgba(60,222,255,.35)}
+#startControls{margin-top:26px;max-width:680px;width:calc(100vw - 40px);background:rgba(13,20,61,.7);border:2px solid #3cdeff;border-radius:12px;padding:16px 20px}
+#startControls .scTitle{color:#ffd33f;font-weight:900;font-size:16px;margin-bottom:10px;text-align:center}
+#startControls .scCols{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+#startControls .scCols>div{flex:1;min-width:230px;font-size:13px;line-height:1.7;color:#dfe6ff}
+#startControls b{color:#67eb62}
 .hidden{display:none!important}
 #menuPanel button{margin-bottom:8px}
 #menuPanel button:last-child{margin-bottom:0}
@@ -133,7 +147,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
     <div class="radio-title">♫ Radio Los Santos</div>
     <div class="radio-sub">Synthwave 88.3 FM</div>
   </div>
-  <div id="prompt">Pressione E para entrar no carro</div>
+  <div id="prompt">Entrar no carro — E ou botão A</div>
   <div id="toast"></div>
   <div id="dialogBox" class="panel">
     <div id="dialogContent">
@@ -184,6 +198,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
   <h1>Nolan City</h1>
   <p>Protótipo jogável top-down com sprites gerados</p>
   <button id="startBtn" disabled>Carregando...</button>
+  <div id="startControls">
+    <div class="scTitle">Controles</div>
+    <div class="scCols">
+      <div><b>No tablet (toque)</b><br>Joystick (esq.) — mover<br><b>A</b> — entrar/sair · falar · confirmar<br><b>B</b> — freio &nbsp; <b>Y</b> — ré<br><b>X</b> — correr (a pé)<br>⚙ menu &nbsp; ⏸ pausa</div>
+      <div><b>No teclado</b><br>WASD / setas — mover<br><b>E</b> — entrar/sair · falar<br><b>H</b> — freio &nbsp; <b>K</b> — ré<br><b>Shift</b> — correr · <b>1–4</b> troca personagem<br><b>M</b> menu</div>
+    </div>
+  </div>
 </div>
 <script>
 const TILE=64;
@@ -196,7 +217,10 @@ const ASSETS={
   people:{boy:AS+'people/main_boy_imagegen.png',girl:AS+'people/main_girl_imagegen.png',hacker:AS+'people/hacker_girl_imagegen.png',courier:AS+'people/food_courier_boy_imagegen.png',magician:AS+'people/street_magician_imagegen.png',skate:AS+'people/skate_kid_imagegen.png'},
   cars:{taxi:AS+'cars/yellow_taxi_imagegen.png',blue:AS+'cars/blue_electric_compact_imagegen.png',green:AS+'cars/green_street_hatchback_imagegen.png',police:AS+'cars/black_blue_police_cruiser_imagegen.png',ambulance:AS+'cars/white_cyan_ambulance_van_imagegen.png',van:AS+'cars/purple_delivery_van_imagegen.png'},
   tiles:{props:AS+'tilesets/park_street_props_sheet.png',facades:AS+'tilesets/building_facades_96_sheet.png',sidewalkOverlay:AS+'tilesets/sidewalk_overlay_sheet.png'},
-  portraits:{luna:AS+'portraits/npc_portrait_luna.png',mia:AS+'portraits/npc_portrait_mia.png',dani:AS+'portraits/npc_portrait_dani.png',niko:AS+'portraits/npc_portrait_niko.png',theo:AS+'portraits/npc_portrait_theo.png',bit:AS+'portraits/npc_portrait_bit.png',rui:AS+'portraits/npc_portrait_rui.png',claudia:AS+'portraits/npc_portrait_claudia.png',vince:AS+'portraits/npc_portrait_vince.png'},
+  portraits:{
+    luna:AS+'portraits/npc_portrait_luna.png',mia:AS+'portraits/npc_portrait_mia.png',dani:AS+'portraits/npc_portrait_dani.png',niko:AS+'portraits/npc_portrait_niko.png',theo:AS+'portraits/npc_portrait_theo.png',bit:AS+'portraits/npc_portrait_bit.png',rui:AS+'portraits/npc_portrait_rui.png',claudia:AS+'portraits/npc_portrait_claudia.png',vince:AS+'portraits/npc_portrait_vince.png',
+    nurseAna:AS+'portraits/npc_portrait_nurse_ana.png',mechanicRato:AS+'portraits/npc_portrait_mechanic_rato.png',floristLis:AS+'portraits/npc_portrait_florist_lis.png',carDealerMax:AS+'portraits/npc_portrait_car_dealer_max.png',arcadeZe:AS+'portraits/npc_portrait_arcade_ze.png',policeIris:AS+'portraits/npc_portrait_police_iris.png',baristaBia:AS+'portraits/npc_portrait_barista_bia.png',storeSara:AS+'portraits/npc_portrait_store_sara.png',taxiMarcelo:AS+'portraits/npc_portrait_taxi_marcelo.png',artistSol:AS+'portraits/npc_portrait_artist_sol.png'
+  },
   ui:{touch:AS+'ui/touch_controls_sheet.png',hud:AS+'ui/hud_status_mission_sheet.png',inv:AS+'ui/inventory_items_sheet.png',panels:AS+'ui/panels_slots_frames_sheet.png'}
 };
 const img={};
@@ -437,7 +461,7 @@ function openNpcDialog(n){
   document.getElementById('dialogName').textContent=name;
   document.getElementById('dialogPortrait').src=cb(ASSETS.portraits[portraitSlugFor(name,n.kind)]);
   document.getElementById('dialogText').textContent=lines[0];
-  document.getElementById('dialogHint').textContent=lines.length>1?'E / clique para continuar':'E / clique para fechar';
+  document.getElementById('dialogHint').textContent=lines.length>1?'E / A / toque para continuar':'E / A / toque para fechar';
   document.getElementById('dialogBox').style.display='block';
   document.getElementById('prompt').style.display='none';
   questEvent('talk');
@@ -448,7 +472,7 @@ function advanceDialog(){
   n._line=(n._line||0)+1;
   if(n._line>=lines.length){closeNpcDialog();return;}
   document.getElementById('dialogText').textContent=lines[n._line];
-  document.getElementById('dialogHint').textContent=n._line<lines.length-1?'E / clique para continuar':'E / clique para fechar';
+  document.getElementById('dialogHint').textContent=n._line<lines.length-1?'E / A / toque para continuar':'E / A / toque para fechar';
 }
 function closeNpcDialog(){
   activeDialog=null;
@@ -501,9 +525,23 @@ function nearestShop(){
   }
   return (bd<1.15&&best)?best:null;
 }
-function setKeeperPortrait(kind){
+function setKeeperPortrait(def){
   const el=document.getElementById('shopKeeper');
-  const src=ASSETS.portraits[{girl:'claudia',courier:'dani',magician:'niko',skate:'theo',hacker:'luna'}[kind]||'mia'];
+  const byName={
+    'Dra. Ana':'nurseAna',
+    'Rato':'mechanicRato',
+    'Lis':'floristLis',
+    'Max':'carDealerMax',
+    'Ze':'arcadeZe',
+    'Iris':'policeIris',
+    'Bia':'baristaBia',
+    'Sara':'storeSara',
+    'Marcelo':'taxiMarcelo',
+    'Sol':'artistSol'
+  };
+  const fallbackByKind={girl:'claudia',courier:'dani',magician:'niko',skate:'theo',hacker:'luna'};
+  const portraitKey=byName[def.name]||fallbackByKind[def.keeper]||'mia';
+  const src=ASSETS.portraits[portraitKey]||ASSETS.portraits.mia;
   el.style.backgroundImage=`url("${cb(src)}")`;
   el.style.backgroundSize='contain';
   el.style.backgroundPosition='center bottom';
@@ -512,7 +550,7 @@ function setKeeperPortrait(kind){
 function openShop(b){
   const def=SHOPS[b.name];if(!def)return;
   activeShop=def;shopOpen=true;
-  setKeeperPortrait(def.keeper);
+  setKeeperPortrait(def);
   document.getElementById('shopName').textContent=def.name+' — '+def.title;
   document.getElementById('shopGreet').textContent=def.greet;
   renderShopItems();
@@ -579,11 +617,11 @@ function setKindPortrait(el,kind){
 }
 function renderMenu(){
   if(!menuOpen)return;
-  const tabs=[['inv','Inventário'],['quests','Missões'],['cars','Carros'],['wanted','Procurado'],['party','Party']];
+  const tabs=[['inv','Inventário'],['quests','Missões'],['cars','Carros'],['wanted','Procurado'],['party','Party'],['help','Ajuda']];
   const nav=document.getElementById('menuTabs');nav.innerHTML='';
   tabs.forEach(([k,lbl])=>{const b=document.createElement('button');b.textContent=lbl;if(k===menuTab)b.className='active';b.onclick=()=>{menuTab=k;renderMenu()};nav.appendChild(b)});
   const body=document.getElementById('menuBody');body.innerHTML='';
-  ({inv:renderInvBody,quests:renderQuestBody,cars:renderCarsBody,wanted:renderWantedBody,party:renderPartyBody}[menuTab]||renderInvBody)(body);
+  ({inv:renderInvBody,quests:renderQuestBody,cars:renderCarsBody,wanted:renderWantedBody,party:renderPartyBody,help:renderHelpBody}[menuTab]||renderInvBody)(body);
 }
 function menuTitle(body,txt){const t=document.createElement('div');t.className='menuTitle';t.textContent=txt;body.appendChild(t)}
 function renderInvBody(body){
@@ -642,6 +680,28 @@ function renderPartyBody(body){
   });
   const hint=document.createElement('div');hint.style.cssText='color:#9edfff;margin-top:8px';hint.textContent='Dica: teclas 1–4 trocam o personagem ativo rapidamente.';
   body.appendChild(hint);
+}
+function renderHelpBody(body){
+  menuTitle(body,'Controles');
+  const rows=[
+    ['Mover','Joystick (esq.)','WASD / setas'],
+    ['Entrar/sair · Falar · Confirmar','Botão A','E'],
+    ['Freio (no carro)','Botão B','H'],
+    ['Ré (no carro)','Botão Y','K'],
+    ['Correr (a pé)','Botão X','Shift'],
+    ['Trocar personagem','aba Party','1 a 4'],
+    ['Abrir/fechar menu','⚙ engrenagem','M'],
+    ['Fechar janelas','botão Fechar','Esc']
+  ];
+  const tbl=document.createElement('div');
+  tbl.innerHTML='<div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px 12px;font-size:14px">'+
+    '<div style="color:#ffd33f;font-weight:900">Ação</div><div style="color:#ffd33f;font-weight:900">Toque</div><div style="color:#ffd33f;font-weight:900">Teclado</div>'+
+    rows.map(r=>`<div style="color:#f8f6ff">${r[0]}</div><div style="color:#67eb62;font-weight:800">${r[1]}</div><div style="color:#9edfff;font-weight:800">${r[2]}</div>`).join('')+
+    '</div>';
+  body.appendChild(tbl);
+  const note=document.createElement('div');note.style.cssText='color:#9edfff;margin-top:14px;line-height:1.5';
+  note.innerHTML='No carro a aceleração é contínua — use o <b style="color:#67eb62">B</b> (freio) para parar e o <b style="color:#67eb62">Y</b> (ré) para voltar. Os botões acendem quando estão sendo usados.';
+  body.appendChild(note);
 }
 
 // ===== Garagem / Carros =====
@@ -843,7 +903,7 @@ function update(dt){
     const car=(npc||shop)?null:nearestCar();
     prompt=!!npc||!!shop||!!car;
     const promptEl=document.getElementById('prompt');
-    promptEl.textContent=npc?'Pressione E ou clique para conversar':shop?('Pressione E para entrar — '+SHOPS[shop.name].title):'Pressione E para entrar no carro';
+    promptEl.textContent=npc?'Conversar — E ou botão A (toque)':shop?('Entrar — E ou botão A — '+SHOPS[shop.name].title):'Entrar no carro — E ou botão A (toque)';
     if(actionDown&&!player._e&&!actionConsumed){
       if(npc)openNpcDialog(npc);
       else if(shop)openShop(shop);
@@ -987,6 +1047,7 @@ function draw(){
   for(const o of map.overlays)drawTrafficLight(o);
   drawBuildingColliders();
   drawMinimap();
+  updateButtonStates();
 }
 function drawMinimap(){
   mctx.clearRect(0,0,154,154);mctx.fillStyle='#091132';mctx.fillRect(0,0,154,154);
@@ -1016,10 +1077,28 @@ function setupTouch(){
   joy.addEventListener('pointermove',moveJoy);joy.addEventListener('pointerup',()=>{touch.active=false;touch.x=touch.y=0;knob.style.left='50%';knob.style.top='50%'});
   function moveJoy(e){if(!touch.active||!base)return;const dx=e.clientX-base.x,dy=e.clientY-base.y,d=Math.min(46,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);touch.x=Math.cos(a)*d/46;touch.y=Math.sin(a)*d/46;knob.style.left=`calc(50% + ${Math.cos(a)*d}px)`;knob.style.top=`calc(50% + ${Math.sin(a)*d}px)`}
   [['btnA','a'],['btnB','b'],['btnX','xbtn'],['btnY','ybtn']].forEach(([id,k])=>{const el=document.getElementById(id);el.addEventListener('pointerdown',e=>{e.preventDefault();touch[k]=true});el.addEventListener('pointerup',()=>touch[k]=false);el.addEventListener('pointerleave',()=>touch[k]=false)});
+  // rotulos de funcao acima de cada botao de acao
+  [['btnA','AÇÃO'],['btnB','FREIO'],['btnY','RÉ'],['btnX','CORRER']].forEach(([id,txt])=>{const el=document.getElementById(id);const l=document.createElement('span');l.className='btnlabel';l.textContent=txt;el.appendChild(l)});
+}
+// Feedback visual: marca os botoes como .pressed conforme o input (toque OU teclado)
+function updateButtonStates(){
+  const set=(id,on)=>{const el=document.getElementById(id);if(el)el.classList.toggle('pressed',!!on)};
+  set('btnA',touch.a||Keys.KeyE);
+  set('btnB',touch.b||Keys.KeyH);
+  set('btnY',touch.ybtn||Keys.KeyK);
+  set('btnX',touch.xbtn||Keys.ShiftLeft);
+  const moving=touch.active||Keys.KeyW||Keys.KeyA||Keys.KeyS||Keys.KeyD||Keys.ArrowUp||Keys.ArrowDown||Keys.ArrowLeft||Keys.ArrowRight;
+  document.getElementById('joy').classList.toggle('pressed',!!moving);
+  set('settingsBtn',menuOpen);
 }
 
 const startBtn=document.getElementById('startBtn');
-startBtn.onclick=async()=>{document.getElementById('start').classList.add('hidden');running=true;last=performance.now();requestAnimationFrame(loop)};
+function goFullscreen(){
+  const el=document.documentElement;
+  const fn=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;
+  if(fn){try{const p=fn.call(el);if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+}
+startBtn.onclick=async()=>{goFullscreen();document.getElementById('start').classList.add('hidden');running=true;last=performance.now();requestAnimationFrame(loop)};
 loadAll().then(()=>{setupUI();setupTouch();draw();startBtn.disabled=false;startBtn.textContent='Jogar';}).catch(err=>{startBtn.textContent='Erro ao carregar assets';console.error(err)});
 </script>
 </body>

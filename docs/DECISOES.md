@@ -214,3 +214,26 @@ balança com sin do tempo). Entrar nele dá toast "Entrou no seu carro" e **não
 **Validado:** aba renderiza meus carros + loja; ativar coloca o carro com setinha na rua; usar
 o carro próprio mantém procurado em 0; comprar Táxi (-$1800) e vender (+$900 = 50%) corretos.
 Zero erros no console.
+
+---
+
+## 2026-05-31 — Publicado no GitHub Pages + melhorias mobile
+
+**Publicação:** jogo no ar em **https://lemon-aid.github.io/gta-clone/** (GitHub Pages, branch
+master, raiz). Criado `index.html` na raiz que redireciona para `nolan-city-playable.html`.
+Atualiza sozinho a cada push no master (~1min). Repo é público (requisito do Pages grátis).
+
+**Melhorias para tablet/controle:**
+- **Tela cheia ao iniciar:** `goFullscreen()` no clique de Jogar (requestFullscreen, no-op se
+  não suportado — ex: Safari iPad). Metas web-app-capable/theme-color adicionadas no <head>.
+- **Feedback visual dos botões:** `updateButtonStates()` (chamado no draw) marca `.pressed`
+  nos botões A/B/X/Y, joystick e engrenagem conforme o input (toque OU teclado). CSS .pressed
+  = brilho + glow + leve scale. Rótulos de função acima dos botões: AÇÃO/FREIO/RÉ/CORRER.
+- **Guia de controles:** legenda na tela inicial (Toque x Teclado) + nova aba **Ajuda** no menu
+  (tabela Ação/Toque/Teclado com todos os comandos).
+- **Avisos com comando de controle:** prompts agora citam toque + teclado, ex.:
+  "Entrar no carro — E ou botão A", "Conversar — E ou botão A (toque)". Dicas do diálogo:
+  "E / A / toque para continuar".
+
+Observação: rAF é pausado em aba de segundo plano — o feedback dos botões só "anima" com a aba
+em foco (no tablet do usuário roda normal). Verificado chamando updateButtonStates direto.
