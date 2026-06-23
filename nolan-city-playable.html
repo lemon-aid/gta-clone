@@ -93,6 +93,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
 #shopFooter{display:flex;align-items:center;justify-content:space-between}
 #shopMoney{color:#67eb62;font-weight:900;font-size:20px}
 #shopClose{padding:10px 22px;border-radius:8px;border:2px solid #ff5dbf;background:#3a1230;color:#fff;font-weight:900;cursor:pointer}
+#party{position:fixed;inset:0;z-index:18;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#3a1466,#0a0820);pointer-events:auto;overflow:hidden}
+#partyCard{position:relative;text-align:center;max-width:560px;width:calc(100vw - 48px);padding:28px 26px;background:rgba(13,20,61,.92);border:3px solid #ff5dbf;border-radius:18px;box-shadow:0 0 30px rgba(255,93,191,.5)}
+#partyCard img{width:150px;height:150px;image-rendering:auto;filter:drop-shadow(0 0 16px rgba(60,222,255,.5));margin-bottom:6px}
+#partyCard h1{font-size:30px;color:#ffd33f;text-shadow:0 0 16px #ff5dbf;margin-bottom:6px}
+#partyCard .big{font-size:46px;margin:4px 0 10px}
+#partyCard p{color:#dfe6ff;font-size:16px;line-height:1.5;margin-bottom:18px}
+#partyCard button{pointer-events:auto;padding:12px 26px;border-radius:10px;border:2px solid #3cdeff;background:#0d143d;color:#fff;font-size:16px;font-weight:900;cursor:pointer}
+.confetti{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall linear infinite}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0)}100%{transform:translateY(105vh) rotate(540deg)}}
 #menu{position:fixed;inset:0;z-index:16;display:flex;align-items:center;justify-content:center;background:rgba(8,6,24,.86);pointer-events:auto}
 #menuBox{position:relative;left:auto;top:auto;width:min(780px,calc(100vw - 40px));max-height:calc(100vh - 60px);padding:18px 20px;display:flex;flex-direction:column}
 #menuTabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
@@ -204,6 +213,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
     </div>
   </div>
 </div>
+<div id="party" class="hidden">
+  <div id="partyCard">
+    <img id="partyImg" alt="Go Games">
+    <div class="big">🎉🎂🎮</div>
+    <h1>Festa de 6 anos do Nolan!</h1>
+    <p id="partyMsg">Bem-vindo ao Go Games! A festa está rolando — bora jogar fliperama e comer bolo! 🎈</p>
+    <button id="partyClose">Voltar ao jogo</button>
+  </div>
+</div>
 <div id="start">
   <h1>Nolan City</h1>
   <p>Protótipo jogável top-down com sprites gerados</p>
@@ -226,7 +244,7 @@ function cb(src){return src+(src.includes('?')?'&':'?')+'v='+ASSET_VER}
 const ASSETS={
   people:{boy:AS+'people/main_boy_imagegen.png',girl:AS+'people/main_girl_imagegen.png',hacker:AS+'people/hacker_girl_imagegen.png',courier:AS+'people/food_courier_boy_imagegen.png',magician:AS+'people/street_magician_imagegen.png',skate:AS+'people/skate_kid_imagegen.png'},
   cars:{taxi:AS+'cars/yellow_taxi_imagegen.png',blue:AS+'cars/blue_electric_compact_imagegen.png',green:AS+'cars/green_street_hatchback_imagegen.png',police:AS+'cars/black_blue_police_cruiser_imagegen.png',ambulance:AS+'cars/white_cyan_ambulance_van_imagegen.png',van:AS+'cars/purple_delivery_van_imagegen.png'},
-  tiles:{props:AS+'tilesets/park_street_props_sheet.png',facades:AS+'tilesets/building_facades_96_sheet.png',sidewalkOverlay:AS+'tilesets/sidewalk_overlay_sheet.png',parking:AS+'tilesets/parking_lot_tileset.png'},
+  tiles:{props:AS+'tilesets/park_street_props_sheet.png',facades:AS+'tilesets/building_facades_96_sheet_with_go_games.png',sidewalkOverlay:AS+'tilesets/sidewalk_overlay_sheet.png',parking:AS+'tilesets/parking_lot_tileset.png',goGamesIcon:AS+'tilesets/go_games_arcade_96.png'},
   portraits:{
     luna:AS+'portraits/npc_portrait_luna.png',mia:AS+'portraits/npc_portrait_mia.png',dani:AS+'portraits/npc_portrait_dani.png',niko:AS+'portraits/npc_portrait_niko.png',theo:AS+'portraits/npc_portrait_theo.png',bit:AS+'portraits/npc_portrait_bit.png',rui:AS+'portraits/npc_portrait_rui.png',claudia:AS+'portraits/npc_portrait_claudia.png',vince:AS+'portraits/npc_portrait_vince.png',
     nurseAna:AS+'portraits/npc_portrait_nurse_ana.png',mechanicRato:AS+'portraits/npc_portrait_mechanic_rato.png',floristLis:AS+'portraits/npc_portrait_florist_lis.png',carDealerMax:AS+'portraits/npc_portrait_car_dealer_max.png',arcadeZe:AS+'portraits/npc_portrait_arcade_ze.png',policeIris:AS+'portraits/npc_portrait_police_iris.png',baristaBia:AS+'portraits/npc_portrait_barista_bia.png',storeSara:AS+'portraits/npc_portrait_store_sara.png',taxiMarcelo:AS+'portraits/npc_portrait_taxi_marcelo.png',artistSol:AS+'portraits/npc_portrait_artist_sol.png'
@@ -250,7 +268,7 @@ const Keys={};
 let debugColliders=false;
 addEventListener('keydown',e=>{Keys[e.code]=true;
   if(e.code==='KeyC'&&!e.repeat)debugColliders=!debugColliders;
-  if(e.code==='Escape'){if(menuOpen)closeMenu();else if(shopOpen)closeShop()}
+  if(e.code==='Escape'){if(menuOpen)closeMenu();else if(shopOpen)closeShop();else if(partyOpen)closeParty()}
   if(e.code==='KeyM'&&!e.repeat&&!shopOpen)menuOpen?closeMenu():openMenu();
   if(/^Digit[1-4]$/.test(e.code)&&!e.repeat)switchMember(parseInt(e.code.slice(5),10)-1);
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
@@ -265,7 +283,8 @@ const BUILDING_BOUNDS=[
   {x:7,y:11,w:89,h:83},{x:4,y:9,w:89,h:85},{x:3,y:9,w:93,h:85},{x:0,y:9,w:90,h:85},
   {x:7,y:7,w:83,h:89},{x:4,y:9,w:92,h:82},{x:0,y:6,w:87,h:81},{x:0,y:4,w:88,h:90},
   {x:5,y:0,w:86,h:96},{x:1,y:9,w:88,h:87},{x:1,y:9,w:95,h:87},{x:0,y:4,w:93,h:92},
-  {x:6,y:0,w:77,h:78},{x:7,y:0,w:89,h:78},{x:0,y:0,w:81,h:82},{x:2,y:0,w:79,h:80}
+  {x:6,y:0,w:77,h:78},{x:7,y:0,w:89,h:78},{x:0,y:0,w:81,h:82},{x:2,y:0,w:79,h:80},
+  {x:7,y:3,w:82,h:92} // index 16: Go Games (arcade da festa)
 ];
 const NPC_W=.42,NPC_H=.64;
 const PROP_BOUNDS={
@@ -304,6 +323,7 @@ function buildMap(){
   const facade=(name,index,x,y)=>map.buildings.push({name,index,x,y,w:BUILDING_W,h:BUILDING_H});
   facade('cafe',4,1,4); facade('hospital',6,4,4); facade('police',7,11,4); facade('garage',8,18,4); facade('arcade',2,29,4); facade('club',11,32,4); facade('hotel',12,39,4);
   facade('bank',9,1,17); facade('mechanic',13,5,17); facade('store',10,18,14); facade('office',15,25,14); facade('flower',3,38,14);
+  facade('gogames',16,14,4); // Go Games — arcade da festa de 6 anos do Nolan
   for(const p of [['palm',0,1,10],['tree',1,4,10],['fountain',14,2,11],['bench',4,1,13],['picnic',5,4,13],['bush',2,6,12],['lamp',6,7,4],['lamp',6,21,14],['trash',11,17,4],['meter',12,38,17],['sign',15,6,15]])map.props.push({name:p[0],index:p[1],x:p[2],y:p[3]});
   for(const o of [[7.8,4.55],[10.2,7.0],[21.8,14.5],[24.2,17.0],[34.8,24.5],[37.2,27.0]])map.overlays.push({type:'traffic',x:o[0],y:o[1]});
   for(let x=37;x<42;x++)for(let y=18;y<21;y++)map.parking.push({x,y});
@@ -401,11 +421,13 @@ const QUESTS=[
   {id:'talk',title:'Primeiro Contato',desc:'Converse com qualquer morador (E perto de um NPC).',reward:300,event:'talk'},
   {id:'enter',title:'Maos ao Volante',desc:'Entre em um veiculo.',reward:300,event:'drive_enter'},
   {id:'drive',title:'Test Drive',desc:'Dirija pela cidade.',reward:400,prog:0,goal:30,event:'drive'},
-  {id:'shop',title:'Primeiras Compras',desc:'Compre um item em qualquer loja.',reward:500,event:'shop_buy'}
+  {id:'shop',title:'Primeiras Compras',desc:'Compre um item em qualquer loja.',reward:500,event:'shop_buy'},
+  {id:'party',title:'Festa do Nolan! 🎂',desc:'Vá até o arcade Go Games para a festa de 6 anos do Nolan.',reward:1000,event:'party'}
 ];
 let questIndex=0;
 let shopOpen=false,activeShop=null;
 let menuOpen=false,menuTab='inv',questFilter='todas';
+let partyOpen=false;
 let wantedTimer=0;
 const cam={x:0,y:0};
 const touch={x:0,y:0,active:false,a:false,b:false,xbtn:false};
@@ -429,6 +451,7 @@ function setupUI(){
   document.getElementById('menuLoad').onclick=()=>{loadGame();renderMenu()};
   document.getElementById('menuCloseBtn').onclick=closeMenu;
   document.getElementById('shopClose').onclick=closeShop;
+  document.getElementById('partyClose').onclick=closeParty;
   updateHUD();renderQuest();
 }
 
@@ -632,6 +655,28 @@ function buyItem(it){
   questEvent('shop_buy');
 }
 function closeShop(){shopOpen=false;activeShop=null;document.getElementById('shop').classList.add('hidden')}
+
+// ===== Go Games — festa do Nolan =====
+function nearestVenue(){ // o arcade Go Games (entrar = festa)
+  const b=map.buildings.find(x=>x.name==='gogames');if(!b)return null;
+  const e=buildingEntrance(b);
+  return Math.hypot(e.x-player.x,e.y-player.y)<1.25?b:null;
+}
+let confettiBuilt=false;
+function buildConfetti(){
+  if(confettiBuilt)return;confettiBuilt=true;
+  const host=document.getElementById('party'),cols=['#ff5dbf','#3cdeff','#ffd33f','#67eb62','#c040ff'];
+  for(let i=0;i<40;i++){const c=document.createElement('span');c.className='confetti';c.style.left=Math.random()*100+'%';c.style.background=cols[i%cols.length];c.style.animationDuration=(2.4+Math.random()*2.6)+'s';c.style.animationDelay=(-Math.random()*4)+'s';host.appendChild(c)}
+}
+function openParty(){
+  partyOpen=true;buildConfetti();
+  document.getElementById('partyImg').src=cb(ASSETS.tiles.goGamesIcon);
+  const first=currentQuest()&&currentQuest().event==='party';
+  document.getElementById('partyMsg').textContent=first?'Você chegou na festa de 6 anos do Nolan! 🎈 Aproveita os fliperamas e o bolo!':'A festa do Nolan continua animada no Go Games! 🎮🎂';
+  document.getElementById('party').classList.remove('hidden');
+  questEvent('party');
+}
+function closeParty(){partyOpen=false;document.getElementById('party').classList.add('hidden')}
 
 // ===== Party =====
 function switchMember(i){
@@ -940,7 +985,7 @@ function update(dt){
   const actionDown=Keys.KeyE||touch.a;
   let actionConsumed=false;
   if(activeDialog&&actionDown&&!player._e){advanceDialog();actionConsumed=true}
-  const blocked=activeDialog||shopOpen||menuOpen;
+  const blocked=activeDialog||shopOpen||menuOpen||partyOpen;
   // Procurado decai com o tempo enquanto a pe e sem cometer crimes
   if(player.wanted>0&&!player.inCar){wantedTimer+=dt;if(wantedTimer>=18){player.wanted--;wantedTimer=0;updateHUD();showToast(player.wanted>0?('Procurado reduzido — '+player.wanted+'★'):'Você despistou a polícia!')}}else{wantedTimer=0}
   let dx=0,dy=0;
@@ -990,13 +1035,15 @@ function update(dt){
       player.anim+=dt*8;
     }
     const npc=nearestNpc();
-    const shop=npc?null:nearestShop();
-    const car=(npc||shop)?null:nearestCar();
-    prompt=!!npc||!!shop||!!car;
+    const venue=npc?null:nearestVenue();
+    const shop=(npc||venue)?null:nearestShop();
+    const car=(npc||venue||shop)?null:nearestCar();
+    prompt=!!npc||!!venue||!!shop||!!car;
     const promptEl=document.getElementById('prompt');
-    promptEl.textContent=npc?'Conversar — E ou botão A (toque)':shop?('Entrar — E ou botão A — '+SHOPS[shop.name].title):'Entrar no carro — E ou botão A (toque)';
+    promptEl.textContent=npc?'Conversar — E ou botão A (toque)':venue?'Entrar na festa do Nolan — E ou botão A 🎂':shop?('Entrar — E ou botão A — '+SHOPS[shop.name].title):'Entrar no carro — E ou botão A (toque)';
     if(actionDown&&!player._e&&!actionConsumed){
       if(npc)openNpcDialog(npc);
+      else if(venue)openParty();
       else if(shop)openShop(shop);
       else if(car){
         const roubo=!car.parked; // carro em patrulha = roubo; carro que voce estacionou ou seu carro = sem punicao

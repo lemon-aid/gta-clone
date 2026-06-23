@@ -300,3 +300,26 @@ restauram hp=100.
 sincroniza com a garagem; oficina lista "Compacto Azul — $400" + "Consertar todos — $400";
 clicar Consertar restaura hp=100 e debita $400; aba Carros mostra barra "HP 45/100". Zero erros.
 (Obs.: a extensão do Chrome e o servidor local caíram no meio — religados e testado com sucesso.)
+
+---
+
+## 2026-05-31 — Prédio Go Games + quest final (Festa do Nolan)
+
+**Asset:** atlas expandido `building_facades_96_sheet_with_go_games.png` (4×5; índices 0–15
+preservados, Go Games no índice 16). `ASSETS.tiles.facades` apontado para ele. Ícone standalone
+`go_games_arcade_96.png` em `ASSETS.tiles.goGamesIcon` (usado na telinha da festa).
+
+**Prédio:** `facade('gogames',16,14,4)` — na zona de entretenimento (entre police e garage, topo).
+BUILDING_BOUNDS[16] = {x:7,y:3,w:82,h:92} (conforme manifest).
+
+**Quest final:** `{id:'party',title:'Festa do Nolan! 🎂',desc:'Vá até o arcade Go Games...',reward:1000,event:'party'}`
+— última do array, ativa após "Primeiras Compras".
+
+**Chegada/festa:** `nearestVenue()` detecta a entrada do Go Games; a pé, prompt "Entrar na festa
+do Nolan — E/A" e `openParty()` abre um overlay festivo (#party): imagem do prédio, 🎉🎂🎮,
+confete animado (CSS keyframes) e botão "Voltar ao jogo". `questEvent('party')` conclui a quest
+(+$1000) na primeira visita; depois continua visitável. `partyOpen` entra no `blocked`; Esc fecha.
+
+**Validado:** prédio renderiza com o letreiro "GO GAMES" e o balão "6"; quest final ativa →
+openParty conclui (+$1000, questIndex 4→5) e mostra a festa com confete; "Voltar ao jogo" fecha.
+Zero erros no console.

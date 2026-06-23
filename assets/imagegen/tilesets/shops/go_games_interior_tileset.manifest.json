@@ -1,0 +1,453 @@
+{
+  "name": "Go Games Interior",
+  "format": "PNG RGBA",
+  "tileSize": [
+    64,
+    64
+  ],
+  "atlasSize": [
+    512,
+    512
+  ],
+  "columns": 8,
+  "rows": 8,
+  "sources": [
+    "assets\\imagegen\\tilesets\\tileset - arcade\\diftexb-558648e2-1f27-424c-8939-0ffb3dbb6b37.png",
+    "assets\\imagegen\\tilesets\\tileset - arcade\\di592ye-36f28ac7-13a5-461d-b1b5-b7026ee357bb.png",
+    "assets\\imagegen\\tilesets\\shops\\shop_arcade_interior_tileset.png"
+  ],
+  "rules": [
+    "Terrain cells are edge-to-edge and walkable unless noted otherwise.",
+    "Arcade machines and counters are bottom-center anchored solid objects.",
+    "Counters form a modular horizontal service line; the register cell is the interaction point.",
+    "Birthday garlands, ceiling balloons, and loose balloons are overlays and do not block movement.",
+    "The birthday cake table, game tables, cabinets, counters, and gift cluster have colliders.",
+    "Place at least one walkable tile in front of every arcade machine and counter interaction point."
+  ],
+  "entries": {
+    "floor_neon_a": {
+      "index": 0,
+      "row": 0,
+      "column": 0,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "floor_neon_b": {
+      "index": 1,
+      "row": 0,
+      "column": 1,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "floor_neon_c": {
+      "index": 2,
+      "row": 0,
+      "column": 2,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "wall_neon": {
+      "index": 3,
+      "row": 0,
+      "column": 3,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "party_carpet_a": {
+      "index": 4,
+      "row": 0,
+      "column": 4,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "party_carpet_b": {
+      "index": 5,
+      "row": 0,
+      "column": 5,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "floor_mirrored": {
+      "index": 6,
+      "row": 0,
+      "column": 6,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "floor_shadow": {
+      "index": 7,
+      "row": 0,
+      "column": 7,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "arcade_cabinet_1": {
+      "index": 8,
+      "row": 1,
+      "column": 0,
+      "category": "arcade",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "arcade_cabinet_2": {
+      "index": 9,
+      "row": 1,
+      "column": 1,
+      "category": "arcade",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "arcade_cabinet_3": {
+      "index": 10,
+      "row": 1,
+      "column": 2,
+      "category": "arcade",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "arcade_cabinet_4": {
+      "index": 11,
+      "row": 1,
+      "column": 3,
+      "category": "arcade",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "arcade_cabinet_5": {
+      "index": 12,
+      "row": 1,
+      "column": 4,
+      "category": "arcade",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "arcade_cabinet_bonus_1": {
+      "index": 13,
+      "row": 1,
+      "column": 5,
+      "category": "arcade",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "arcade_cabinet_bonus_2": {
+      "index": 14,
+      "row": 1,
+      "column": 6,
+      "category": "arcade",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "arcade_cabinet_bonus_3": {
+      "index": 15,
+      "row": 1,
+      "column": 7,
+      "category": "arcade",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "counter_left": {
+      "index": 16,
+      "row": 2,
+      "column": 0,
+      "category": "counter",
+      "collision": "solid",
+      "anchor": "tile"
+    },
+    "counter_middle": {
+      "index": 17,
+      "row": 2,
+      "column": 1,
+      "category": "counter",
+      "collision": "solid",
+      "anchor": "tile"
+    },
+    "counter_right": {
+      "index": 18,
+      "row": 2,
+      "column": 2,
+      "category": "counter",
+      "collision": "solid",
+      "anchor": "tile"
+    },
+    "counter_corner": {
+      "index": 19,
+      "row": 2,
+      "column": 3,
+      "category": "counter",
+      "collision": "solid",
+      "anchor": "tile"
+    },
+    "counter_register": {
+      "index": 20,
+      "row": 2,
+      "column": 4,
+      "category": "counter",
+      "collision": "solid-interaction",
+      "anchor": "tile"
+    },
+    "prize_terminal": {
+      "index": 21,
+      "row": 2,
+      "column": 5,
+      "category": "counter",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "ticket_machine": {
+      "index": 22,
+      "row": 2,
+      "column": 6,
+      "category": "counter",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "prize_shelf": {
+      "index": 23,
+      "row": 2,
+      "column": 7,
+      "category": "counter",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "birthday_table_with_cake": {
+      "index": 24,
+      "row": 3,
+      "column": 0,
+      "category": "party",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "birthday_cake_large": {
+      "index": 25,
+      "row": 3,
+      "column": 1,
+      "category": "party",
+      "collision": "overlay",
+      "anchor": "center"
+    },
+    "birthday_cake_small": {
+      "index": 26,
+      "row": 3,
+      "column": 2,
+      "category": "party",
+      "collision": "overlay",
+      "anchor": "center"
+    },
+    "gift_cluster": {
+      "index": 27,
+      "row": 3,
+      "column": 3,
+      "category": "party",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "balloon_cluster_a": {
+      "index": 28,
+      "row": 3,
+      "column": 4,
+      "category": "party",
+      "collision": "overlay",
+      "anchor": "bottom-center"
+    },
+    "balloon_cluster_b": {
+      "index": 29,
+      "row": 3,
+      "column": 5,
+      "category": "party",
+      "collision": "overlay",
+      "anchor": "bottom-center"
+    },
+    "birthday_garland": {
+      "index": 30,
+      "row": 3,
+      "column": 6,
+      "category": "party",
+      "collision": "overlay-no-collision",
+      "anchor": "top-center"
+    },
+    "ceiling_balloons": {
+      "index": 31,
+      "row": 3,
+      "column": 7,
+      "category": "party",
+      "collision": "overlay-no-collision",
+      "anchor": "top-center"
+    },
+    "pool_table_horizontal": {
+      "index": 32,
+      "row": 4,
+      "column": 0,
+      "category": "games",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "pool_table_vertical": {
+      "index": 33,
+      "row": 4,
+      "column": 1,
+      "category": "games",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "air_hockey_vertical": {
+      "index": 34,
+      "row": 4,
+      "column": 2,
+      "category": "games",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "air_hockey_horizontal": {
+      "index": 35,
+      "row": 4,
+      "column": 3,
+      "category": "games",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "arcade_sofa": {
+      "index": 36,
+      "row": 4,
+      "column": 4,
+      "category": "games",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "multiplayer_console": {
+      "index": 37,
+      "row": 4,
+      "column": 5,
+      "category": "games",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "snack_plate": {
+      "index": 38,
+      "row": 4,
+      "column": 6,
+      "category": "party",
+      "collision": "overlay",
+      "anchor": "center"
+    },
+    "birthday_candles": {
+      "index": 39,
+      "row": 4,
+      "column": 7,
+      "category": "party",
+      "collision": "overlay",
+      "anchor": "center"
+    },
+    "balloon_blue": {
+      "index": 40,
+      "row": 5,
+      "column": 0,
+      "category": "party",
+      "collision": "overlay-no-collision",
+      "anchor": "top-center"
+    },
+    "balloon_red": {
+      "index": 41,
+      "row": 5,
+      "column": 1,
+      "category": "party",
+      "collision": "overlay-no-collision",
+      "anchor": "top-center"
+    },
+    "balloon_green": {
+      "index": 42,
+      "row": 5,
+      "column": 2,
+      "category": "party",
+      "collision": "overlay-no-collision",
+      "anchor": "top-center"
+    },
+    "balloon_gold": {
+      "index": 43,
+      "row": 5,
+      "column": 3,
+      "category": "party",
+      "collision": "overlay-no-collision",
+      "anchor": "top-center"
+    },
+    "party_pinata": {
+      "index": 44,
+      "row": 5,
+      "column": 4,
+      "category": "party",
+      "collision": "overlay-no-collision",
+      "anchor": "top-center"
+    },
+    "editor_floor_copy_1": {
+      "index": 56,
+      "row": 7,
+      "column": 0,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "editor_floor_copy_2": {
+      "index": 57,
+      "row": 7,
+      "column": 1,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "editor_floor_copy_3": {
+      "index": 58,
+      "row": 7,
+      "column": 2,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "editor_floor_copy_4": {
+      "index": 59,
+      "row": 7,
+      "column": 3,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "editor_floor_copy_5": {
+      "index": 60,
+      "row": 7,
+      "column": 4,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "editor_floor_copy_6": {
+      "index": 61,
+      "row": 7,
+      "column": 5,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "editor_floor_copy_7": {
+      "index": 62,
+      "row": 7,
+      "column": 6,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    },
+    "editor_floor_copy_8": {
+      "index": 63,
+      "row": 7,
+      "column": 7,
+      "category": "terrain",
+      "collision": "walkable",
+      "anchor": "tile"
+    }
+  }
+}

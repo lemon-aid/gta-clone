@@ -18,9 +18,9 @@
   "collision": {
     "recommended": {
       "x": 7,
-      "y": 14,
+      "y": 3,
       "width": 82,
-      "height": 81
+      "height": 92
     },
     "entrance": {
       "side": "south",
