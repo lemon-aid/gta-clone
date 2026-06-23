@@ -1,0 +1,207 @@
+{
+  "sourceRoot": "D:\\cris\\ai gaming design\\GTA clone\\assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48",
+  "outputRoot": "assets\\paid_adapted\\modern_exteriors_64",
+  "tileSize": 64,
+  "terrain": {
+    "asphalt_clean": {
+      "file": "assets/paid_adapted/modern_exteriors_64/terrain/asphalt_clean.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\2_City_Terrains_Singles_48x48\\ME_Singles_City_Terrains_48x48_Asphalt_1_Variation_24.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "edge-to-edge terrain tile, no transparency padding"
+    },
+    "asphalt_detail": {
+      "file": "assets/paid_adapted/modern_exteriors_64/terrain/asphalt_detail.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\2_City_Terrains_Singles_48x48\\ME_Singles_City_Terrains_48x48_Asphalt_1_Variation_25.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "edge-to-edge terrain tile, no transparency padding"
+    },
+    "sidewalk": {
+      "file": "assets/paid_adapted/modern_exteriors_64/terrain/sidewalk.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\2_City_Terrains_Singles_48x48\\ME_Singles_City_Terrains_48x48_Sidewalk_1_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "edge-to-edge terrain tile, no transparency padding"
+    },
+    "grass": {
+      "file": "assets/paid_adapted/modern_exteriors_64/terrain/grass.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\1_Terrains_and_Fences_Singles_48x48\\ME_Singles_Terrains_and_Fences_48x48_Grass_1_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "edge-to-edge terrain tile, no transparency padding"
+    },
+    "grass_edge": {
+      "file": "assets/paid_adapted/modern_exteriors_64/terrain/grass_edge.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\1_Terrains_and_Fences_Singles_48x48\\ME_Singles_Terrains_and_Fences_48x48_Grass_1_13.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "edge-to-edge terrain tile, no transparency padding"
+    }
+  },
+  "props": {
+    "bench": {
+      "file": "assets/paid_adapted/modern_exteriors_64/props/bench.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\3_City_Props_Singles_48x48\\ME_Singles_City_Props_48x48_Bench_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "overlay prop, anchor at bottom center, transparent padding preserved"
+    },
+    "cone": {
+      "file": "assets/paid_adapted/modern_exteriors_64/props/cone.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\3_City_Props_Singles_48x48\\ME_Singles_City_Props_48x48_Cone_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "overlay prop, anchor at bottom center, transparent padding preserved"
+    },
+    "hydrant": {
+      "file": "assets/paid_adapted/modern_exteriors_64/props/hydrant.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\3_City_Props_Singles_48x48\\ME_Singles_City_Props_48x48_Hydrant_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "overlay prop, anchor at bottom center, transparent padding preserved"
+    },
+    "trash": {
+      "file": "assets/paid_adapted/modern_exteriors_64/props/trash.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\3_City_Props_Singles_48x48\\ME_Singles_City_Props_48x48_Black_Closed_Trash_Can.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "overlay prop, anchor at bottom center, transparent padding preserved"
+    },
+    "statue": {
+      "file": "assets/paid_adapted/modern_exteriors_64/props/statue.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\17_Garden_Singles_48x48\\ME_Singles_Garden_48x48_Angel_Statue_1.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "overlay prop, anchor at bottom center, transparent padding preserved"
+    },
+    "garden_bench": {
+      "file": "assets/paid_adapted/modern_exteriors_64/props/garden_bench.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\17_Garden_Singles_48x48\\ME_Singles_Garden_48x48_Big_Bench_Horizontal.png",
+      "size": [
+        64,
+        64
+      ],
+      "rule": "overlay prop, anchor at bottom center, transparent padding preserved"
+    }
+  },
+  "buildings": {
+    "market_small": {
+      "file": "assets/paid_adapted/modern_exteriors_64/buildings/market_small.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\9_Shopping_Center_and_Markets_Singles_48x48\\ME_Singles_Shopping_Center_and_Markets_48x48_Market_Small_1.png",
+      "sourceSize": [
+        240,
+        384
+      ],
+      "size": [
+        192,
+        307
+      ],
+      "rule": "uniformly resized facade copy; original paid asset is unchanged"
+    },
+    "market_medium": {
+      "file": "assets/paid_adapted/modern_exteriors_64/buildings/market_medium.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\9_Shopping_Center_and_Markets_Singles_48x48\\ME_Singles_Shopping_Center_and_Markets_48x48_Market_Medium_1.png",
+      "sourceSize": [
+        336,
+        432
+      ],
+      "size": [
+        256,
+        329
+      ],
+      "rule": "uniformly resized facade copy; original paid asset is unchanged"
+    },
+    "mall": {
+      "file": "assets/paid_adapted/modern_exteriors_64/buildings/mall.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\9_Shopping_Center_and_Markets_Singles_48x48\\ME_Singles_Shopping_Center_and_Markets_48x48_Mall_1.png",
+      "sourceSize": [
+        864,
+        576
+      ],
+      "size": [
+        384,
+        256
+      ],
+      "rule": "uniformly resized facade copy; original paid asset is unchanged"
+    },
+    "hospital": {
+      "file": "assets/paid_adapted/modern_exteriors_64/buildings/hospital.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\12_Hotel_and_Hospital_Singles_48x48\\ME_Singles_Hotel_and_Hospital_48x48_Hospital_1.png",
+      "sourceSize": [
+        1296,
+        1008
+      ],
+      "size": [
+        384,
+        299
+      ],
+      "rule": "uniformly resized facade copy; original paid asset is unchanged"
+    },
+    "hotel": {
+      "file": "assets/paid_adapted/modern_exteriors_64/buildings/hotel.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\12_Hotel_and_Hospital_Singles_48x48\\ME_Singles_Hotel_and_Hospital_48x48_Hotel_1.png",
+      "sourceSize": [
+        816,
+        1104
+      ],
+      "size": [
+        256,
+        346
+      ],
+      "rule": "uniformly resized facade copy; original paid asset is unchanged"
+    },
+    "police": {
+      "file": "assets/paid_adapted/modern_exteriors_64/buildings/police.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\15_Police_Station_Singles_48x48\\ME_Singles_Police_Station_48x48_Police_Station_1.png",
+      "sourceSize": [
+        1008,
+        864
+      ],
+      "size": [
+        320,
+        274
+      ],
+      "rule": "uniformly resized facade copy; original paid asset is unchanged"
+    },
+    "police_small": {
+      "file": "assets/paid_adapted/modern_exteriors_64/buildings/police_small.png",
+      "source": "assets\\paid\\Exterior\\modernexteriors-win\\Modern_Exteriors_48x48\\ME_Theme_Sorter_48x48\\15_Police_Station_Singles_48x48\\ME_Singles_Police_Station_48x48_Police_Station_Small_1.png",
+      "sourceSize": [
+        336,
+        624
+      ],
+      "size": [
+        192,
+        357
+      ],
+      "rule": "uniformly resized facade copy; original paid asset is unchanged"
+    }
+  },
+  "notes": [
+    "Original paid assets are never overwritten.",
+    "Terrain is normalized to 64x64 for the current Nolan City grid.",
+    "Props are isolated 64x64 overlays with transparent RGBA background.",
+    "Buildings are uniformly resized derivatives for preview map validation."
+  ]
+}

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nolan City - Paid Exterior Map Preview</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#11121d;color:#eef6ff;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif}
+  canvas{display:block;width:100vw;height:100vh;image-rendering:pixelated}
+  #hud{position:fixed;left:16px;top:14px;z-index:2;max-width:min(560px,calc(100vw - 32px));padding:12px 14px;border:2px solid #41d7ff;border-radius:10px;background:rgba(10,16,38,.86);box-shadow:0 0 24px rgba(65,215,255,.28)}
+  #hud b{display:block;font-size:16px;margin-bottom:4px;color:#fff}
+  #hud span{display:block;font-size:13px;line-height:1.35;color:#bdd9ff}
+  #legend{position:fixed;right:16px;bottom:14px;z-index:2;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:520px}
+  .pill{border:1px solid rgba(255,255,255,.18);background:rgba(8,12,28,.78);border-radius:999px;padding:6px 9px;font-size:12px;color:#d9e9ff}
+</style>
+</head>
+<body>
+<canvas id="map"></canvas>
+<div id="hud">
+  <b>Nolan City - segundo mapa com tiles pagos</b>
+  <span>Preview visual separado do jogo atual. Originais preservados em <code>assets/paid/Exterior</code>; cópias adaptadas em <code>assets/paid_adapted/modern_exteriors_64</code>.</span>
+</div>
+<div id="legend">
+  <div class="pill">ruas conectadas</div>
+  <div class="pill">sem setas no asfalto</div>
+  <div class="pill">prédios colados na calçada</div>
+  <div class="pill">props como overlays</div>
+</div>
+<script>
+const TILE=64, MAP_W=44, MAP_H=32;
+const ROOT='assets/paid_adapted/modern_exteriors_64/';
+const OLD='assets/imagegen/';
+const canvas=document.getElementById('map');
+const ctx=canvas.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+
+const sources={
+  asphalt:ROOT+'terrain/asphalt_clean.png',
+  asphaltDetail:ROOT+'terrain/asphalt_detail.png',
+  sidewalk:ROOT+'terrain/sidewalk.png',
+  grass:ROOT+'terrain/grass.png',
+  grassEdge:ROOT+'terrain/grass_edge.png',
+  bench:ROOT+'props/bench.png',
+  cone:ROOT+'props/cone.png',
+  hydrant:ROOT+'props/hydrant.png',
+  trash:ROOT+'props/trash.png',
+  statue:ROOT+'props/statue.png',
+  gardenBench:ROOT+'props/garden_bench.png',
+  marketSmall:ROOT+'buildings/market_small.png',
+  marketMedium:ROOT+'buildings/market_medium.png',
+  mall:ROOT+'buildings/mall.png',
+  hospital:ROOT+'buildings/hospital.png',
+  hotel:ROOT+'buildings/hotel.png',
+  police:ROOT+'buildings/police.png',
+  policeSmall:ROOT+'buildings/police_small.png',
+  boy:OLD+'people/main_boy_imagegen.png',
+  girl:OLD+'people/main_girl_imagegen.png',
+  hacker:OLD+'people/hacker_girl_imagegen.png',
+  courier:OLD+'people/food_courier_boy_imagegen.png',
+  magician:OLD+'people/street_magician_imagegen.png',
+  skate:OLD+'people/skate_kid_imagegen.png',
+  taxi:OLD+'cars/yellow_taxi_imagegen.png',
+  blue:OLD+'cars/blue_electric_compact_imagegen.png',
+  green:OLD+'cars/green_street_hatchback_imagegen.png',
+  policeCar:OLD+'cars/black_blue_police_cruiser_imagegen.png',
+  van:OLD+'cars/purple_delivery_van_imagegen.png'
+};
+const img={};
+function loadImage(src){
+  return new Promise((resolve,reject)=>{
+    const im=new Image();
+    im.onload=()=>resolve(im);
+    im.onerror=()=>reject(new Error('Falha ao carregar '+src));
+    im.src=src+'?v=paid-preview-1';
+  });
+}
+async function loadAll(){
+  await Promise.all(Object.entries(sources).map(async ([k,src])=>img[k]=await loadImage(src)));
+}
+
+const hPairs=[[5,6],[15,16],[25,26]];
+const vPairs=[[8,9],[22,23],[35,36]];
+function inPair(n,pairs){return pairs.some(([a,b])=>n===a||n===b)}
+function isRoad(x,y){return inPair(y,hPairs)||inPair(x,vPairs)}
+function isIntersection(x,y){return inPair(y,hPairs)&&inPair(x,vPairs)}
+function randTile(x,y){return ((x*928371+y*1237)&3)===0}
+function drawTile(im,x,y){ctx.drawImage(im,x*TILE,y*TILE,TILE,TILE)}
+
+function drawTerrain(){
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      const park=x>=1&&x<=7&&y>=9&&y<=14;
+      if(park) drawTile((x===1||x===7||y===9||y===14)?img.grassEdge:img.grass,x,y);
+      else if(isRoad(x,y)) drawTile(randTile(x,y)?img.asphaltDetail:img.asphalt,x,y);
+      else drawTile(img.sidewalk,x,y);
+    }
+  }
+}
+
+function drawRoadRules(){
+  ctx.save();
+  ctx.lineCap='butt';
+  ctx.lineWidth=4;
+  ctx.strokeStyle='#f6cf3c';
+  ctx.setLineDash([34,28]);
+  for(const [y0] of hPairs){
+    const y=(y0+1)*TILE;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(MAP_W*TILE,y); ctx.stroke();
+  }
+  for(const [x0] of vPairs){
+    const x=(x0+1)*TILE;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,MAP_H*TILE); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.strokeStyle='#9a7bc7';
+  ctx.lineWidth=5;
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      if(!isRoad(x,y))continue;
+      const px=x*TILE, py=y*TILE;
+      if(!isRoad(x,y-1)){ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+TILE,py);ctx.stroke()}
+      if(!isRoad(x,y+1)){ctx.beginPath();ctx.moveTo(px,py+TILE);ctx.lineTo(px+TILE,py+TILE);ctx.stroke()}
+      if(!isRoad(x-1,y)){ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,py+TILE);ctx.stroke()}
+      if(!isRoad(x+1,y)){ctx.beginPath();ctx.moveTo(px+TILE,py);ctx.lineTo(px+TILE,py+TILE);ctx.stroke()}
+    }
+  }
+  ctx.restore();
+}
+
+function crosswalk(x,y,vertical=false){
+  ctx.save();
+  ctx.fillStyle='rgba(245,247,255,.95)';
+  if(vertical){
+    for(let i=0;i<7;i++)ctx.fillRect(x*TILE+7+i*8,y*TILE+5,4,TILE*2-10);
+  }else{
+    for(let i=0;i<7;i++)ctx.fillRect(x*TILE+5,y*TILE+7+i*8,TILE*2-10,4);
+  }
+  ctx.restore();
+}
+function drawCrosswalks(){
+  for(const [x0] of vPairs){
+    for(const [y0] of hPairs){
+      crosswalk(x0-1,y0,true);
+      crosswalk(x0+2,y0,true);
+      crosswalk(x0,y0-1,false);
+      crosswalk(x0,y0+2,false);
+    }
+  }
+}
+
+function drawBuilding(name,cx,groundTileY){
+  const im=img[name];
+  const x=cx*TILE-im.width/2;
+  const y=groundTileY*TILE-im.height+4;
+  ctx.drawImage(im,Math.round(x),Math.round(y));
+}
+function drawProp(name,x,y,scale=1){
+  const im=img[name], w=64*scale, h=64*scale;
+  ctx.drawImage(im,Math.round((x+.5)*TILE-w/2),Math.round((y+1)*TILE-h),w,h);
+}
+function drawPeople(kind,x,y,dir='down'){
+  const rows={down:0,left:1,right:2,up:3};
+  const im=img[kind], row=rows[dir]||0, col=0;
+  const px=x*TILE-24, py=y*TILE-58;
+  ctx.drawImage(im,col*64,row*64,64,64,Math.round(px),Math.round(py),48,48);
+}
+function drawCar(kind,x,y,dir){
+  const rows={down:0,left:1,right:2,up:3};
+  const im=img[kind], row=rows[dir]||0;
+  ctx.drawImage(im,0,row*64,64,64,Math.round(x*TILE+4),Math.round(y*TILE+4),56,56);
+}
+
+function drawParkingLot(){
+  const x0=36,y0=18,w=7,h=5;
+  ctx.fillStyle='#171829';
+  ctx.fillRect(x0*TILE,y0*TILE,w*TILE,h*TILE);
+  ctx.strokeStyle='#ececff';
+  ctx.lineWidth=3;
+  for(let y=0;y<2;y++)for(let x=0;x<3;x++)ctx.strokeRect((x0+1+x*2)*TILE+8,(y0+y*2)*TILE+9,TILE+48,TILE+34);
+  ctx.fillStyle='#d9d9ff';
+  ctx.font='bold 34px system-ui';
+  ctx.fillText('P',x0*TILE+18,y0*TILE+42);
+}
+
+function drawOverlays(){
+  drawProp('statue',3,11,1.2);
+  drawProp('gardenBench',1.5,13,1.2);
+  drawProp('bench',5,13);
+  drawProp('trash',6,11);
+  drawProp('hydrant',2,4,.9);
+  drawProp('cone',17,15,.95);
+  drawProp('cone',30,25,.95);
+  for(const p of [[8,4],[21,14],[34,24],[37,16]]){
+    ctx.fillStyle='#111629';
+    ctx.fillRect(p[0]*TILE+45,p[1]*TILE+10,8,42);
+    ctx.fillStyle='#f54b54';ctx.beginPath();ctx.arc(p[0]*TILE+49,p[1]*TILE+17,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ffd946';ctx.beginPath();ctx.arc(p[0]*TILE+49,p[1]*TILE+31,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#49ef7c';ctx.beginPath();ctx.arc(p[0]*TILE+49,p[1]*TILE+45,4,0,Math.PI*2);ctx.fill();
+  }
+}
+
+function drawScene(){
+  drawTerrain();
+  drawRoadRules();
+  drawCrosswalks();
+  drawParkingLot();
+
+  drawBuilding('marketSmall',2.6,5);
+  drawBuilding('hospital',5.6,5);
+  drawBuilding('policeSmall',12.3,5);
+  drawBuilding('mall',18.4,5);
+  drawBuilding('marketMedium',30.6,5);
+  drawBuilding('hotel',40.2,5);
+  drawBuilding('police',4.8,25);
+  drawBuilding('marketMedium',14.5,25);
+  drawBuilding('marketSmall',25.2,25);
+  drawBuilding('mall',31.0,15);
+
+  drawOverlays();
+
+  drawCar('taxi',3,5,'right');
+  drawCar('blue',19,6,'left');
+  drawCar('green',6,16,'left');
+  drawCar('policeCar',8,2,'down');
+  drawCar('van',35,13,'down');
+  drawCar('blue',22,21,'up');
+
+  drawPeople('hacker',2.4,4.6,'down');
+  drawPeople('girl',24.2,10.3,'left');
+  drawPeople('courier',39.2,18.4,'right');
+  drawPeople('magician',2.1,13.4,'down');
+  drawPeople('skate',39.2,4.4,'left');
+  drawPeople('boy',13.4,4.8,'down');
+}
+
+function resize(){
+  const dpr=Math.max(1,Math.min(devicePixelRatio||1,2));
+  canvas.width=innerWidth*dpr;
+  canvas.height=innerHeight*dpr;
+  canvas.style.width=innerWidth+'px';
+  canvas.style.height=innerHeight+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  render();
+}
+function render(){
+  if(!Object.keys(img).length)return;
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  ctx.imageSmoothingEnabled=false;
+  const worldW=MAP_W*TILE, worldH=MAP_H*TILE;
+  const scale=Math.min(innerWidth/worldW,innerHeight/worldH)*.98;
+  const ox=(innerWidth-worldW*scale)/2;
+  const oy=(innerHeight-worldH*scale)/2;
+  ctx.save();
+  ctx.translate(Math.round(ox),Math.round(oy));
+  ctx.scale(scale,scale);
+  drawScene();
+  ctx.restore();
+}
+addEventListener('resize',resize);
+loadAll().then(resize).catch(err=>{
+  document.getElementById('hud').innerHTML='<b>Erro ao carregar preview</b><span>'+err.message+'</span>';
+  console.error(err);
+});
+</script>
+</body>
+</html>

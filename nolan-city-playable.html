@@ -14,7 +14,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
 #game{display:block;width:100vw;height:100vh;image-rendering:auto;background:#090c24}
 #hud{position:fixed;inset:0;pointer-events:none}
 .panel{position:absolute;background:rgba(13,20,61,.86);border:3px solid #3cdeff;border-radius:14px;box-shadow:0 0 18px rgba(60,222,255,.35),inset 0 0 24px rgba(30,50,120,.45)}
-#status{left:18px;top:18px;width:312px;height:94px;padding:14px 16px}
+#status{left:18px;top:18px;width:312px;min-height:94px;padding:14px 16px}
+#carRow{display:none;align-items:center;gap:8px;margin-top:10px}
+#carRow .lbl{font-weight:900;font-size:13px;color:#cfe9ff;letter-spacing:.5px}
+.carbar{flex:1;height:10px;border-radius:6px;background:#2a2746;overflow:hidden;border:1px solid #3a3660}
+.carbar>span{display:block;height:100%;background:#3cdeff;transition:width .15s}
+#carhpTxt{font-size:13px;font-weight:900;min-width:62px;text-align:right}
 #mission{left:360px;top:18px;width:420px;height:100px;border-color:#ff5dbf;padding:14px 18px}
 #inventory{right:24px;top:132px;width:300px;height:142px;padding:12px 16px;display:none}
 #menuPanel{position:absolute;right:24px;top:86px;width:180px;padding:10px;display:none;pointer-events:auto}
@@ -136,6 +141,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
       <span id="moneyIcon" class="sprite" style="margin-left:28px"></span><span class="cash" id="cash">$2,000</span>
     </div>
     <div class="stars" id="stars"></div>
+    <div id="carRow">
+      <span class="lbl">🚗 CARRO</span>
+      <div class="carbar"><span id="carbarFill"></span></div>
+      <span id="carhpTxt"></span>
+    </div>
   </div>
   <div id="mission" class="panel">
     <div class="mission-title">Fuga da Cidade</div>
@@ -322,7 +332,7 @@ const cars=[
 ];
 // Carro proprio do jogador (garagem). Sempre parked (sem punicao ao usar) e nunca patrulha.
 // So aparece no mapa quando ha um carro ativo (myCar.active).
-const myCar={kind:'blue',x:0,y:0,dir:'down',vx:0,vy:0,parked:true,owned:true,active:false};
+const myCar={kind:'blue',x:0,y:0,dir:'down',vx:0,vy:0,parked:true,owned:true,active:false,hp:100};
 cars.push(myCar);
 // Catalogo da loja de carros e garagem do jogador
 const CAR_CATALOG=[
@@ -333,7 +343,7 @@ const CAR_CATALOG=[
   {kind:'ambulance',name:'Ambulancia',price:3000},
   {kind:'police',name:'Viatura',price:4000}
 ];
-let ownedCars=[{kind:'blue',name:'Compacto Azul',price:1200}]; // carro inicial
+let ownedCars=[{kind:'blue',name:'Compacto Azul',price:1200,hp:100}]; // carro inicial
 let activeCarIdx=-1;
 const npcs=[
   {kind:'hacker',x:2,y:3,dir:'down',name:'Luna',lines:['As cameras estao limpas por enquanto.','Se precisar abrir um portao, e so me chamar.']},
@@ -373,7 +383,7 @@ const SHOPS={
     {label:'Cafe Expresso',price:30,hp:20,desc:'+20 de vida'},
     {label:'Fatia de Bolo',price:80,hp:45,desc:'+45 de vida'}
   ]},
-  mechanic:{title:'Oficina do Rato',keeper:'magician',name:'Rato',greet:'Carro batendo? Aqui a gente resolve.',items:[
+  mechanic:{title:'Oficina do Rato',keeper:'magician',name:'Rato',greet:'Carro batendo? Aqui a gente resolve.',repair:true,items:[
     {label:'Reparo Rapido',price:120,hp:30,desc:'Uma geral em voce tambem',buyMsg:'Tudo nos trinques!'},
     {label:'Turbo (cosmetico)',price:600,desc:'So pra dar status'}
   ]},
@@ -497,6 +507,16 @@ function updateHUD(){
   document.getElementById('cash').textContent='$'+player.cash.toLocaleString('en-US');
   const stars=document.getElementById('stars');stars.innerHTML='';
   for(let i=0;i<5;i++){const s=document.createElement('span');s.className='sprite';uiBg(s,ASSETS.ui.hud,i<player.wanted?1:2,28);stars.appendChild(s)}
+  const carRow=document.getElementById('carRow');
+  if(player.inCar){
+    const hp=player.inCar.hp==null?100:player.inCar.hp;
+    carRow.style.display='flex';
+    const fill=document.getElementById('carbarFill');
+    fill.style.width=Math.max(0,hp)+'%';
+    fill.style.background=hp<=0?'#ff4040':hp<30?'#ffae42':'#3cdeff';
+    document.getElementById('carhpTxt').textContent=hp<=0?'QUEBRADO':Math.round(hp)+'/100';
+    document.getElementById('carhpTxt').style.color=hp<=0?'#ff6b6b':'#fff';
+  }else carRow.style.display='none';
 }
 
 // ---- Quests ----
@@ -580,6 +600,26 @@ function renderShopItems(){
     btn.onclick=()=>buyItem(it);
     row.append(left,btn);wrap.appendChild(row);
   });
+  if(activeShop.repair){
+    const sep=document.createElement('div');sep.className='desc';sep.style.cssText='margin:6px 2px 2px;color:#ffd33f;font-weight:900;font-size:14px';sep.textContent='Consertar carros';wrap.appendChild(sep);
+    let anyDamaged=false;
+    ownedCars.forEach((c,i)=>{
+      const cost=repairCost(c);if(cost<=0)return;anyDamaged=true;
+      const row=document.createElement('div');row.className='shopItem';
+      const left=document.createElement('div');
+      left.innerHTML=`<div class="info">${c.name} — $${cost}</div><div class="desc">${carHP(c)<=0?'Quebrado':('HP '+Math.round(carHP(c))+'/100')} → 100</div>`;
+      const btn=document.createElement('button');btn.textContent='Consertar';btn.disabled=player.cash<cost;btn.onclick=()=>repairCar(i);
+      row.append(left,btn);wrap.appendChild(row);
+    });
+    const total=ownedCars.reduce((s,c)=>s+repairCost(c),0);
+    if(total>0){
+      const row=document.createElement('div');row.className='shopItem';row.style.borderColor='#ffd33f';
+      const left=document.createElement('div');left.innerHTML=`<div class="info">Consertar todos — $${total}</div><div class="desc">Restaura a frota inteira</div>`;
+      const btn=document.createElement('button');btn.textContent='Consertar';btn.disabled=player.cash<total;btn.onclick=()=>repairAll();
+      row.append(left,btn);wrap.appendChild(row);
+    }
+    if(!anyDamaged){const ok=document.createElement('div');ok.className='desc';ok.textContent='Todos os seus carros estão inteiros. 👍';wrap.appendChild(ok)}
+  }
   document.getElementById('shopMoney').textContent='Dinheiro: $'+player.cash.toLocaleString('en-US');
 }
 function buyItem(it){
@@ -734,13 +774,13 @@ function spawnMyCar(){
 }
 function setActiveCar(i){
   if(i<0||i>=ownedCars.length)return;
-  activeCarIdx=i;myCar.kind=ownedCars[i].kind;spawnMyCar();
-  renderMenu();showToast(ownedCars[i].name+' está ativo no mapa');
+  activeCarIdx=i;myCar.kind=ownedCars[i].kind;if(ownedCars[i].hp==null)ownedCars[i].hp=100;myCar.hp=ownedCars[i].hp;spawnMyCar();
+  renderMenu();updateHUD();showToast(ownedCars[i].name+' está ativo no mapa');
 }
 function buyCar(cat){
   if(player.cash<cat.price){showToast('Dinheiro insuficiente');return}
   player.cash-=cat.price;
-  ownedCars.push({kind:cat.kind,name:cat.name,price:cat.price});
+  ownedCars.push({kind:cat.kind,name:cat.name,price:cat.price,hp:100});
   updateHUD();renderMenu();showToast('Comprou '+cat.name+'!');
 }
 function sellCar(i){
@@ -753,13 +793,43 @@ function sellCar(i){
   else if(i<activeCarIdx){activeCarIdx--}
   player.cash+=refund;updateHUD();renderMenu();showToast('Vendeu '+name+' (+$'+refund+')');
 }
+// ---- Saude / colisao dos carros ----
+const REPAIR_PER_HP=4; // custo por ponto de vida ao consertar
+function carHP(c){return c.hp==null?100:c.hp}
+function carOverlap(c,x,y){ // colisao entre carros (player car vs outros)
+  for(const o of cars){if(o===c)continue;if(o===myCar&&!myCar.active)continue;if(Math.abs(o.x-x)<0.72&&Math.abs(o.y-y)<0.72)return true}
+  return false;
+}
+function damageCar(c,dmg){
+  if(dmg<=0)return;
+  c.hp=Math.max(0,carHP(c)-dmg);
+  if(c===myCar&&activeCarIdx>=0)ownedCars[activeCarIdx].hp=c.hp; // sincroniza com a garagem
+  if(c.hp<=0)showToast('Carro quebrado! Leve ao mecânico');
+  updateHUD();
+}
+function repairCost(c){return Math.ceil((100-carHP(c))*REPAIR_PER_HP)}
+function repairCar(i){
+  const c=ownedCars[i];if(!c)return;const cost=repairCost(c);
+  if(cost<=0){showToast('Esse carro já está inteiro');return}
+  if(player.cash<cost){showToast('Dinheiro insuficiente');return}
+  player.cash-=cost;c.hp=100;if(i===activeCarIdx)myCar.hp=100;
+  updateHUD();renderShopItems();showToast(c.name+' consertado!');
+}
+function repairAll(){
+  const total=ownedCars.reduce((s,c)=>s+repairCost(c),0);
+  if(total<=0){showToast('Todos os carros já estão inteiros');return}
+  if(player.cash<total){showToast('Dinheiro insuficiente');return}
+  player.cash-=total;ownedCars.forEach(c=>c.hp=100);if(activeCarIdx>=0)myCar.hp=100;
+  updateHUD();renderShopItems();showToast('Frota consertada! (-$'+total+')');
+}
 function renderCarsBody(body){
   menuTitle(body,'Meus Carros');
   ownedCars.forEach((c,i)=>{
     const row=document.createElement('div');row.className='partyItem';
     const p=document.createElement('div');p.className='portrait sprite';setCarPortrait(p,c.kind);
     const main=document.createElement('div');main.className='itemMain';
-    main.innerHTML=`<div class="nm">${c.name} ${i===activeCarIdx?'<span class="badge active">Ativo</span>':''}</div><div class="sub">Revenda: $${Math.floor(c.price*0.5)}</div>`;
+    const hp=carHP(c),hpcol=hp<=0?'#ff4040':hp<30?'#ffae42':'#67eb62',hptxt=hp<=0?'Quebrado':('HP '+Math.round(hp)+'/100');
+    main.innerHTML=`<div class="nm">${c.name} ${i===activeCarIdx?'<span class="badge active">Ativo</span>':''} ${hp<=0?'<span class="badge locked">Quebrado</span>':''}</div><div class="sub">${hptxt} · Revenda: $${Math.floor(c.price*0.5)}</div><div class="hpbar"><span style="width:${Math.max(0,hp)}%;background:${hpcol}"></span></div>`;
     const wrap=document.createElement('div');wrap.style.cssText='display:flex;gap:8px';
     const aBtn=document.createElement('button');aBtn.className='menuBtn'+(i===activeCarIdx?' active':'');aBtn.textContent=i===activeCarIdx?'Ativo':'Ativar';aBtn.disabled=i===activeCarIdx;aBtn.onclick=()=>setActiveCar(i);
     const sBtn=document.createElement('button');sBtn.className='menuBtn';sBtn.style.borderColor='#ff5dbf';sBtn.style.background='#3a1230';sBtn.textContent='Vender';sBtn.onclick=()=>sellCar(i);
@@ -782,7 +852,7 @@ function saveGame(){
   PARTY[activeMember].hp=player.hp; // sincroniza HP do ativo antes de salvar
   const data={
     player:{x:player.x,y:player.y,hp:player.hp,cash:player.cash,wanted:player.wanted,dir:player.dir,inCar:player.inCar?cars.indexOf(player.inCar):-1},
-    cars:cars.map(c=>({x:c.x,y:c.y,dir:c.dir,vx:c.vx||0,vy:c.vy||0,parked:!!c.parked})),
+    cars:cars.map(c=>({x:c.x,y:c.y,dir:c.dir,vx:c.vx||0,vy:c.vy||0,parked:!!c.parked,hp:carHP(c)})),
     questIndex,questProg:(currentQuest()&&currentQuest().goal!=null)?currentQuest().prog:0,
     inventory,party:PARTY.map(m=>({hp:m.hp})),activeMember,
     ownedCars,activeCarIdx,myCar:{kind:myCar.kind,active:myCar.active},
@@ -797,7 +867,7 @@ function loadGame(){
   try{
     const d=JSON.parse(raw);
     Object.assign(player,{x:d.player.x,y:d.player.y,hp:d.player.hp,cash:d.player.cash,wanted:d.player.wanted,dir:d.player.dir});
-    (d.cars||[]).forEach((cd,i)=>{if(cars[i]){cars[i].x=cd.x;cars[i].y=cd.y;cars[i].dir=cd.dir;cars[i].vx=cd.vx;cars[i].vy=cd.vy;cars[i].parked=!!cd.parked}});
+    (d.cars||[]).forEach((cd,i)=>{if(cars[i]){cars[i].x=cd.x;cars[i].y=cd.y;cars[i].dir=cd.dir;cars[i].vx=cd.vx;cars[i].vy=cd.vy;cars[i].parked=!!cd.parked;if(cd.hp!=null)cars[i].hp=cd.hp}});
     player.inCar=(d.player.inCar>=0)?cars[d.player.inCar]:null;
     questIndex=d.questIndex||0;
     if(currentQuest()&&currentQuest().goal!=null)currentQuest().prog=d.questProg||0;
@@ -808,6 +878,7 @@ function loadGame(){
     if(Array.isArray(d.ownedCars))ownedCars=d.ownedCars;
     if(typeof d.activeCarIdx==='number')activeCarIdx=d.activeCarIdx;
     if(d.myCar){myCar.kind=d.myCar.kind||myCar.kind;myCar.active=!!d.myCar.active}
+    if(activeCarIdx>=0&&ownedCars[activeCarIdx])myCar.hp=ownedCars[activeCarIdx].hp==null?100:ownedCars[activeCarIdx].hp;
     closeShop();closeNpcDialog();
     updateHUD();renderQuest();
     showToast('Jogo carregado!');
@@ -882,25 +953,33 @@ function update(dt){
   if(player.inCar){
     const c=player.inCar;
     if(c.vx===undefined){c.vx=0;c.vy=0}
-    const ACCEL=18,MAXSPD=9,FRICTION=0.6,BRAKE_F=6,REV_ACCEL=11;
+    if(c.hp==null)c.hp=100;
+    const broken=c.hp<=0;
+    c._hitcd=Math.max(0,(c._hitcd||0)-dt);
+    const ACCEL=18,MAXSPD=9,FRICTION=0.6,BRAKE_F=6,REV_ACCEL=11,IMPACT=3,DMG=3.2;
     const braking=Keys.KeyH||touch.b;
     const reversing=Keys.KeyK||touch.ybtn;
-    if(!blocked&&(dx||dy)){
+    if(!blocked&&!broken&&(dx||dy)){
       c.vx+=dx*ACCEL*dt;c.vy+=dy*ACCEL*dt;
       if(Math.abs(dx)>Math.abs(dy))c.dir=dx>0?'right':'left';else c.dir=dy>0?'down':'up';
     }
-    if(!blocked&&reversing){
+    if(!blocked&&broken&&(dx||dy)&&c._hitcd<=0){showToast('Carro quebrado — leve ao mecânico');c._hitcd=2}
+    if(!blocked&&!broken&&reversing){
       const dv={right:[1,0],left:[-1,0],down:[0,1],up:[0,-1]}[c.dir]||[0,1];
       c.vx-=dv[0]*REV_ACCEL*dt;c.vy-=dv[1]*REV_ACCEL*dt;
     }
     c.vx-=c.vx*FRICTION*dt;c.vy-=c.vy*FRICTION*dt;
     if(!blocked&&braking){c.vx-=c.vx*BRAKE_F*dt;c.vy-=c.vy*BRAKE_F*dt;if(Math.hypot(c.vx,c.vy)<0.05){c.vx=0;c.vy=0}}
     const sp=Math.hypot(c.vx,c.vy);if(sp>MAXSPD){c.vx*=MAXSPD/sp;c.vy*=MAXSPD/sp}
-    const nx=c.x+c.vx*dt;if(!carBlocked(nx,c.y))c.x=nx;else c.vx=0;
-    const ny=c.y+c.vy*dt;if(!carBlocked(c.x,ny))c.y=ny;else c.vy=0;
+    let hit=0; // velocidade do impacto (parede/predio/outro carro)
+    const nx=c.x+c.vx*dt;
+    if(!carBlocked(nx,c.y)&&!carOverlap(c,nx,c.y))c.x=nx;else{if(Math.abs(c.vx)>IMPACT)hit=Math.max(hit,Math.abs(c.vx));c.vx=0}
+    const ny=c.y+c.vy*dt;
+    if(!carBlocked(c.x,ny)&&!carOverlap(c,c.x,ny))c.y=ny;else{if(Math.abs(c.vy)>IMPACT)hit=Math.max(hit,Math.abs(c.vy));c.vy=0}
+    if(hit>0&&c._hitcd<=0){damageCar(c,Math.round((hit-IMPACT)*DMG+4));c._hitcd=0.45}
     questDrive(Math.abs(c.vx*dt)+Math.abs(c.vy*dt));
     player.x=c.x;player.y=c.y;
-    if(actionDown&&!player._e&&!actionConsumed){c.vx=0;c.vy=0;c.parked=true;player.inCar=null;player.x+=.7;showToast('Saiu do veiculo')}
+    if(actionDown&&!player._e&&!actionConsumed){c.vx=0;c.vy=0;c.parked=true;player.inCar=null;player.x+=.7;showToast('Saiu do veiculo');updateHUD()}
   }else if(!blocked){
     const sp=(Keys.ShiftLeft||touch.xbtn)?player.speed*1.45:player.speed;
     if(dx||dy){
@@ -922,9 +1001,9 @@ function update(dt){
       else if(car){
         const roubo=!car.parked; // carro em patrulha = roubo; carro que voce estacionou ou seu carro = sem punicao
         player.inCar=car;car.vx=0;car.vy=0;
-        if(roubo){player.wanted=Math.min(5,player.wanted+1);updateHUD();showToast('Carro roubado! Procurado +1')}
+        if(roubo){player.wanted=Math.min(5,player.wanted+1);showToast('Carro roubado! Procurado +1')}
         else showToast(car===myCar?'Entrou no seu carro':'Entrou no veiculo');
-        questEvent('drive_enter');
+        updateHUD();questEvent('drive_enter');
       }
     }
   }

@@ -269,3 +269,32 @@ corredor tipo "rua"). O usuário pediu p/ aproximar das referências (asfalto ci
   placa "P" e setas de entrada no topo.
 - `PLOT={x:11,y:17,w:10,h:7}`; todo o lote é dirigível; topo encosta na rua row16.
 O tileset PNG continua registrado em ASSETS.tiles.parking mas não é mais desenhado.
+
+---
+
+## 2026-05-31 — Sistema de saúde e colisão dos carros
+
+**HP por carro:** cada carro tem `hp` (0–100). `ownedCars[i].hp` é a fonte da verdade da garagem;
+`myCar.hp` espelha o carro ativo (sincroniza em setActiveCar/damageCar). `carHP(c)` = 100 se null.
+
+**Dano em colisão:** no bloco de física do carro, ao bater (carBlocked = parede/prédio, OU
+`carOverlap` = outro carro) com velocidade > IMPACT(3), aplica `damageCar` =
+`round((vel-IMPACT)*3.2 + 4)` com cooldown 0.45s. Adicionada colisão carro‑a‑carro: o carro do
+jogador agora para ao encostar em outro carro (antes atravessava).
+
+**Carro quebrado (hp=0):** não acelera nem dá ré (só desliza com atrito); mostra "Carro quebrado —
+leve ao mecânico". Só volta a andar após conserto.
+
+**HUD:** barra de HP do carro ativo no painel de status, abaixo das estrelas, visível só dentro do
+carro (`#carRow`, `updateHUD`). Cor muda: azul / laranja (<30) / vermelho (quebrado).
+
+**Garagem (aba Carros):** cada carro mostra barra de HP + selo "Quebrado" quando 0.
+
+**Mecânico (Oficina do Rato, `repair:true`):** ao entrar, além dos itens, lista conserto por carro
+(custo = HP faltante × `REPAIR_PER_HP`=4) e "Consertar todos". `repairCar`/`repairAll` debitam e
+restauram hp=100.
+
+**Save/load:** hp salvo nos carros e na garagem; myCar.hp ressincronizado no load.
+
+**Status do teste:** sintaxe validada com `node --check` (OK). Teste visual no navegador ficou
+PENDENTE — a extensão do Chrome caiu durante esta sessão. Validar no jogo quando reconectar.

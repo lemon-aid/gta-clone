@@ -1,0 +1,36 @@
+{
+  "name": "Go Games",
+  "type": "building_facade",
+  "theme": "arcade_birthday_venue",
+  "dimensions": [96, 96],
+  "format": "PNG",
+  "colorMode": "RGBA",
+  "anchor": "bottom-center",
+  "atlas": {
+    "file": "building_facades_96_sheet_with_go_games.png",
+    "cellSize": [96, 96],
+    "columns": 4,
+    "rows": 5,
+    "index": 16,
+    "row": 4,
+    "column": 0
+  },
+  "collision": {
+    "recommended": {
+      "x": 7,
+      "y": 14,
+      "width": 82,
+      "height": 81
+    },
+    "entrance": {
+      "side": "south",
+      "centerX": 48
+    }
+  },
+  "notes": [
+    "Standalone facade uses true alpha transparency.",
+    "Place the bottom edge on the sidewalk baseline.",
+    "Keep at least one full sidewalk tile between the entrance and the road.",
+    "The expanded atlas preserves indices 0 through 15 from the original sheet."
+  ]
+}
