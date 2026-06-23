@@ -296,5 +296,7 @@ restauram hp=100.
 
 **Save/load:** hp salvo nos carros e na garagem; myCar.hp ressincronizado no load.
 
-**Status do teste:** sintaxe validada com `node --check` (OK). Teste visual no navegador ficou
-PENDENTE — a extensão do Chrome caiu durante esta sessão. Validar no jogo quando reconectar.
+**Validado no navegador:** HUD mostra "100/100" no carro; 6 batidas de 20 → "QUEBRADO" (0%) e
+sincroniza com a garagem; oficina lista "Compacto Azul — $400" + "Consertar todos — $400";
+clicar Consertar restaura hp=100 e debita $400; aba Carros mostra barra "HP 45/100". Zero erros.
+(Obs.: a extensão do Chrome e o servidor local caíram no meio — religados e testado com sucesso.)
