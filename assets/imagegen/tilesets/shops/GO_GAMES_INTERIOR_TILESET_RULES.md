@@ -15,26 +15,33 @@
 
 ## Organização
 
-- Índices `0-7`: pisos, paredes e carpetes; desenhar na camada de terreno.
+- Índices `0-7`: variações do piso laranja; desenhar na camada de terreno.
 - Índices `8-15`: máquinas de arcade; objetos sólidos com interação pela frente.
-- Índices `16-23`: balcão, caixa, terminal e prateleira de prêmios.
+- Índices `16-19`: balcão azul em U, dividido em quatro quadrantes de um módulo `2x2`.
+- Índices `20-23`: assento, terminais e prateleira de prêmios.
 - Índices `24-31`: mesa do bolo, bolos, presentes, balões e guirlandas.
 - Índices `32-39`: mesas de jogos, sofá, console, doces e velas.
 - Índices `40-44`: decoração suspensa; sem collider.
-- Índices `56-63`: cópias dos terrenos para facilitar o editor.
+- Índices `45-55`: bilheteria, pipoqueira, refrigerantes, snacks, assentos e móveis adicionais.
+- Índices `56-63`: pisos escuros e parede do salão.
 
 ## Regras Procedurais
 
-1. Preencher toda a sala com um terreno dos índices `0-7` antes de colocar objetos.
+1. Preencher a sala com os pisos escuros `56-58`; usar os índices `0-7` como piso laranja da área destacada da festa.
 2. Colocar máquinas junto às paredes, com pelo menos um tile caminhável livre na frente.
 3. Não encostar duas máquinas no mesmo ponto de interação.
-4. Montar o balcão com módulos consecutivos `16-20`; o índice `20` é o caixa/interação.
-5. Manter pelo menos dois tiles livres diante do caixa para fila e conversa com atendente.
-6. Usar collider nos índices `8-29` e `32-37`, conforme o manifesto.
-7. Balões, guirlandas e itens marcados como `overlay-no-collision` devem ficar na camada superior e nunca bloquear o jogador.
-8. A mesa do bolo (`24`) deve ficar em uma área aberta, com caminho livre em pelo menos três lados.
-9. Presentes (`27`) podem ficar próximos da mesa, mas não podem bloquear a saída ou o balcão.
-10. A entrada da loja deve permanecer conectada ao balcão e à área da festa por caminhos de pelo menos um tile de largura.
+4. Montar o balcão em U como um bloco fixo `2x2`: `16,17` na linha superior e `18,19` na linha inferior.
+5. A abertura original do U fica voltada para cima; preservar essa orientação e posicionar a área de atendimento diante dela.
+6. Manter pelo menos dois tiles livres diante do balcão para fila e conversa com atendente.
+7. Usar collider nos índices `8-29` e `32-37`, conforme o manifesto.
+8. Balões, guirlandas e itens marcados como `overlay-no-collision` devem ficar na camada superior e nunca bloquear o jogador.
+9. A mesa do bolo (`24`) deve ficar em uma área aberta, com caminho livre em pelo menos três lados.
+10. Presentes (`27`) podem ficar próximos da mesa, mas não podem bloquear a saída ou o balcão.
+11. A entrada da loja deve permanecer conectada ao balcão e à área da festa por caminhos de pelo menos um tile de largura.
+12. Pipoqueira (`46`) e refrigerantes (`47`) devem ficar lado a lado, sobre piso caminhável e com um tile livre diante de cada interação.
+13. A bilheteria (`45`) funciona como ponto de serviço separado do balcão em U e precisa de acesso frontal livre.
+14. Pipoca e bebidas nunca podem ser colocadas diretamente no piso. Usar `48` para mesa vermelha com pipoca e `49` para mesa amarela com bebidas.
+15. Os índices `51-52` são as mesmas mesas sem itens e podem receber outros overlays de comida ou prêmios.
 
 ## Camadas Recomendadas
 

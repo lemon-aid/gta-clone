@@ -323,3 +323,38 @@ confete animado (CSS keyframes) e botão "Voltar ao jogo". `questEvent('party')`
 **Validado:** prédio renderiza com o letreiro "GO GAMES" e o balão "6"; quest final ativa →
 openParty conclui (+$1000, questIndex 4→5) e mostra a festa com confete; "Voltar ao jogo" fecha.
 Zero erros no console.
+
+---
+
+## 2026-06-23 — Cena interna jogável do Go Games (festa do Nolan)
+
+Em vez de só avisar a chegada, agora o jogador **entra de fato na festa** — uma 2ª cena jogável.
+
+**Tileset:** `go_games_interior_tileset.png` (8×8, 64px) + manifest do Codex. Registrado em
+`ASSETS.tiles.arcadeInt`. Mapa **autorado em código** (`buildArcade`) seguindo as regras —
+não havia arquivo de mapa, só o tileset + preview.
+
+**Cena (`scene = 'city' | 'arcade'`):** `loop` alterna entre `update/draw` (cidade) e
+`updateArcade/drawArcade` (arcade). Mapa 16×10 centralizado na tela (sem scroll). `enterArcade`
+salva a posição na cidade, posiciona o player no spawn e troca o HUD (esconde minimapa/missão/
+rádio, mostra `#arcadeHud` com fichas/tickets). `exitArcade` (porta "SAÍDA" embaixo) volta à
+cidade na frente do Go Games.
+
+**Layout:** parede neon no topo, fileira de 8 fliperamas, área da festa em piso laranja com
+bolo+presentes+balões, pool/air-hockey, concessões (bilheteria, pipoca, refri, geladeira),
+balcão em U e o **atendente Zé** (sprite skate, retrato arcadeZe).
+
+**Interações (E / botão A):**
+- Fliperamas: gastam 1 ficha, dão tickets (mensagem com nome de jogo aleatório).
+- Balcão (Zé): abre a loja de fichas (`SHOPS.arcadeCounter`, 5 fichas/$10, 20/$30) — `buyItem`
+  trata `it.fichas`. (Refatorado `openShop`→`openShopDef(def)` p/ reusar a UI da loja.)
+- Pipoca (+20 HP) e refrigerante/geladeira (+15 HP) **de graça**; bolo (+30 HP).
+- Bilheteria: mostra os tickets acumulados (prêmios futuros).
+- Colisão: paredes + objetos sólidos (não-overlay); balões/guirlandas são overlay sem colisão.
+
+A chegada na 1ª vez completa a quest final (+$1000) e mostra o splash de festa por cima
+(botão "Vamos brincar! 🎮" fecha e revela a sala). `scene='arcade'` entra no `blocked` do menu/loja.
+
+**Validado no navegador:** sala renderiza (fliperamas, festa, concessões, balcão, Zé, porta);
+comprar fichas (−$10, +5), jogar (−1 ficha, +tickets), pipoca/refri/bolo curam; colisão de
+parede/objeto/fora-do-mapa OK; saída volta à cidade com HUD restaurado. Zero erros no console.

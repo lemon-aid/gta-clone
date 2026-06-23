@@ -93,6 +93,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
 #shopFooter{display:flex;align-items:center;justify-content:space-between}
 #shopMoney{color:#67eb62;font-weight:900;font-size:20px}
 #shopClose{padding:10px 22px;border-radius:8px;border:2px solid #ff5dbf;background:#3a1230;color:#fff;font-weight:900;cursor:pointer}
+#arcadeHud{position:absolute;left:50%;top:18px;transform:translateX(-50%);padding:8px 18px;border:2px solid #ffd33f;border-radius:20px;background:rgba(13,20,61,.9);color:#ffd33f;font-weight:900;font-size:16px;white-space:nowrap;box-shadow:0 0 14px rgba(255,211,63,.4)}
 #party{position:fixed;inset:0;z-index:18;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#3a1466,#0a0820);pointer-events:auto;overflow:hidden}
 #partyCard{position:relative;text-align:center;max-width:560px;width:calc(100vw - 48px);padding:28px 26px;background:rgba(13,20,61,.92);border:3px solid #ff5dbf;border-radius:18px;box-shadow:0 0 30px rgba(255,93,191,.5)}
 #partyCard img{width:150px;height:150px;image-rendering:auto;filter:drop-shadow(0 0 16px rgba(60,222,255,.5));margin-bottom:6px}
@@ -166,6 +167,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090c24;font-family:
     <div class="radio-title">♫ Radio Los Santos</div>
     <div class="radio-sub">Synthwave 88.3 FM</div>
   </div>
+  <div id="arcadeHud" class="hidden"></div>
   <div id="prompt">Entrar no carro — E ou botão A</div>
   <div id="toast"></div>
   <div id="dialogBox" class="panel">
@@ -244,7 +246,7 @@ function cb(src){return src+(src.includes('?')?'&':'?')+'v='+ASSET_VER}
 const ASSETS={
   people:{boy:AS+'people/main_boy_imagegen.png',girl:AS+'people/main_girl_imagegen.png',hacker:AS+'people/hacker_girl_imagegen.png',courier:AS+'people/food_courier_boy_imagegen.png',magician:AS+'people/street_magician_imagegen.png',skate:AS+'people/skate_kid_imagegen.png'},
   cars:{taxi:AS+'cars/yellow_taxi_imagegen.png',blue:AS+'cars/blue_electric_compact_imagegen.png',green:AS+'cars/green_street_hatchback_imagegen.png',police:AS+'cars/black_blue_police_cruiser_imagegen.png',ambulance:AS+'cars/white_cyan_ambulance_van_imagegen.png',van:AS+'cars/purple_delivery_van_imagegen.png'},
-  tiles:{props:AS+'tilesets/park_street_props_sheet.png',facades:AS+'tilesets/building_facades_96_sheet_with_go_games.png',sidewalkOverlay:AS+'tilesets/sidewalk_overlay_sheet.png',parking:AS+'tilesets/parking_lot_tileset.png',goGamesIcon:AS+'tilesets/go_games_arcade_96.png'},
+  tiles:{props:AS+'tilesets/park_street_props_sheet.png',facades:AS+'tilesets/building_facades_96_sheet_with_go_games.png',sidewalkOverlay:AS+'tilesets/sidewalk_overlay_sheet.png',parking:AS+'tilesets/parking_lot_tileset.png',goGamesIcon:AS+'tilesets/go_games_arcade_96.png',arcadeInt:AS+'tilesets/shops/go_games_interior_tileset.png'},
   portraits:{
     luna:AS+'portraits/npc_portrait_luna.png',mia:AS+'portraits/npc_portrait_mia.png',dani:AS+'portraits/npc_portrait_dani.png',niko:AS+'portraits/npc_portrait_niko.png',theo:AS+'portraits/npc_portrait_theo.png',bit:AS+'portraits/npc_portrait_bit.png',rui:AS+'portraits/npc_portrait_rui.png',claudia:AS+'portraits/npc_portrait_claudia.png',vince:AS+'portraits/npc_portrait_vince.png',
     nurseAna:AS+'portraits/npc_portrait_nurse_ana.png',mechanicRato:AS+'portraits/npc_portrait_mechanic_rato.png',floristLis:AS+'portraits/npc_portrait_florist_lis.png',carDealerMax:AS+'portraits/npc_portrait_car_dealer_max.png',arcadeZe:AS+'portraits/npc_portrait_arcade_ze.png',policeIris:AS+'portraits/npc_portrait_police_iris.png',baristaBia:AS+'portraits/npc_portrait_barista_bia.png',storeSara:AS+'portraits/npc_portrait_store_sara.png',taxiMarcelo:AS+'portraits/npc_portrait_taxi_marcelo.png',artistSol:AS+'portraits/npc_portrait_artist_sol.png'
@@ -415,6 +417,10 @@ const SHOPS={
   ]},
   arcade:{title:'Arcade Neon',keeper:'skate',name:'Ze',greet:'Bora jogar um fliperama?',items:[
     {label:'Ficha de Jogo',price:20,desc:'Diversao garantida',buyMsg:'Game on!'}
+  ]},
+  arcadeCounter:{title:'Balcão Go Games',keeper:'skate',name:'Zé',greet:'E aí! Quer fichas pra jogar os fliperamas? 🎟️',items:[
+    {label:'5 Fichas',price:10,fichas:5,desc:'+5 fichas pra jogar'},
+    {label:'20 Fichas',price:30,fichas:20,desc:'+20 fichas (melhor preço!)'}
   ]}
 };
 const QUESTS=[
@@ -428,6 +434,9 @@ let questIndex=0;
 let shopOpen=false,activeShop=null;
 let menuOpen=false,menuTab='inv',questFilter='todas';
 let partyOpen=false;
+let scene='city';       // 'city' | 'arcade'
+let fichas=0,tickets=0; // moeda do arcade e tickets ganhos
+let cityReturn=null;    // posicao p/ voltar ao sair do arcade
 let wantedTimer=0;
 const cam={x:0,y:0};
 const touch={x:0,y:0,active:false,a:false,b:false,xbtn:false};
@@ -587,7 +596,7 @@ function setKeeperPortrait(def){
     'Rato':'mechanicRato',
     'Lis':'floristLis',
     'Max':'carDealerMax',
-    'Ze':'arcadeZe',
+    'Ze':'arcadeZe','Zé':'arcadeZe',
     'Iris':'policeIris',
     'Bia':'baristaBia',
     'Sara':'storeSara',
@@ -602,8 +611,8 @@ function setKeeperPortrait(def){
   el.style.backgroundPosition='center bottom';
   el.style.backgroundRepeat='no-repeat';
 }
-function openShop(b){
-  const def=SHOPS[b.name];if(!def)return;
+function openShopDef(def){
+  if(!def)return;
   activeShop=def;shopOpen=true;
   setKeeperPortrait(def);
   document.getElementById('shopName').textContent=def.name+' — '+def.title;
@@ -612,6 +621,7 @@ function openShop(b){
   document.getElementById('prompt').style.display='none';
   document.getElementById('shop').classList.remove('hidden');
 }
+function openShop(b){openShopDef(SHOPS[b.name])}
 function renderShopItems(){
   const wrap=document.getElementById('shopItems');wrap.innerHTML='';
   activeShop.items.forEach(it=>{
@@ -648,11 +658,14 @@ function renderShopItems(){
 function buyItem(it){
   if(player.cash<it.price){showToast('Dinheiro insuficiente');return}
   player.cash-=it.price;
-  const ic=it.hp>=100?1:it.hp>=40?3:it.hp>0?4:0; // icone pelo poder de cura
-  addItem({key:it.label,label:it.label,icon:ic,heal:it.hp||0}); // vai para o inventario
-  updateHUD();renderShopItems();
-  showToast(it.buyMsg||('Comprou '+it.label));
-  questEvent('shop_buy');
+  if(it.fichas){fichas+=it.fichas;showToast('+'+it.fichas+' fichas! 🎟️ Total: '+fichas)}
+  else{
+    const ic=it.hp>=100?1:it.hp>=40?3:it.hp>0?4:0; // icone pelo poder de cura
+    addItem({key:it.label,label:it.label,icon:ic,heal:it.hp||0}); // vai para o inventario
+    showToast(it.buyMsg||('Comprou '+it.label));
+    questEvent('shop_buy');
+  }
+  updateHUD();renderShopItems();updateArcadeHud();
 }
 function closeShop(){shopOpen=false;activeShop=null;document.getElementById('shop').classList.add('hidden')}
 
@@ -668,15 +681,147 @@ function buildConfetti(){
   const host=document.getElementById('party'),cols=['#ff5dbf','#3cdeff','#ffd33f','#67eb62','#c040ff'];
   for(let i=0;i<40;i++){const c=document.createElement('span');c.className='confetti';c.style.left=Math.random()*100+'%';c.style.background=cols[i%cols.length];c.style.animationDuration=(2.4+Math.random()*2.6)+'s';c.style.animationDelay=(-Math.random()*4)+'s';host.appendChild(c)}
 }
-function openParty(){
+function openPartySplash(){ // celebração na primeira chegada (por cima da cena jogável)
   partyOpen=true;buildConfetti();
   document.getElementById('partyImg').src=cb(ASSETS.tiles.goGamesIcon);
-  const first=currentQuest()&&currentQuest().event==='party';
-  document.getElementById('partyMsg').textContent=first?'Você chegou na festa de 6 anos do Nolan! 🎈 Aproveita os fliperamas e o bolo!':'A festa do Nolan continua animada no Go Games! 🎮🎂';
+  document.getElementById('partyMsg').textContent='Você chegou na festa de 6 anos do Nolan! 🎈 Pegue fichas com o Zé, jogue os fliperamas e aproveite a pipoca e o refri de graça!';
+  document.getElementById('partyClose').textContent='Vamos brincar! 🎮';
   document.getElementById('party').classList.remove('hidden');
-  questEvent('party');
 }
 function closeParty(){partyOpen=false;document.getElementById('party').classList.add('hidden')}
+
+// ===== Cena interna do Go Games (arcade da festa) =====
+const ARC={W:16,H:10,built:false,floor:[],objs:[],solid:new Set(),
+  npc:{x:13.5,y:6.5,kind:'skate',name:'Zé',dir:'down'},
+  spawn:{x:7.5,y:7.6}, exit:{x:7.5,y:9.2}, ox:0, oy:0};
+function akey(x,y){return x+','+y}
+function arcTile(idx){return sheet(ASSETS.tiles.arcadeInt,Math.floor(idx/8),idx%8)}
+function buildArcade(){
+  const W=ARC.W,H=ARC.H,DK=[56,57,58,60,61,62,63],OR=[0,1,2,3,4,5,6,7];
+  ARC.floor=[];
+  for(let y=0;y<H;y++){const r=[];for(let x=0;x<W;x++){
+    if(y===0)r.push(59);                                   // parede neon no topo
+    else if(x>=2&&x<=6&&y>=4&&y<=6)r.push(OR[(x+y)%8]);     // piso laranja da festa
+    else r.push(DK[(x*3+y*7)%DK.length]);                  // piso escuro
+  }ARC.floor.push(r)}
+  const O=(x,y,idx,type,opt={})=>ARC.objs.push({x,y,idx,type:type||null,solid:opt.solid!==false&&!opt.overlay,overlay:!!opt.overlay});
+  // fliperamas no topo
+  [[1,8],[2,9],[3,10],[4,11],[5,12],[6,13],[9,14],[10,15]].forEach(([x,i])=>O(x,1,i,'arcade'));
+  // festa (piso laranja)
+  O(4,5,24,'cake'); O(3,5,27,null);                         // bolo + presentes
+  O(2,4,28,null,{overlay:true}); O(6,4,29,null,{overlay:true});
+  // jogos embaixo à esquerda
+  O(2,8,32,'game'); O(4,8,35,'game'); O(6,7,50,null);
+  // concessões à direita
+  O(8,7,45,'prizes'); O(9,7,46,'popcorn'); O(10,7,47,'soda'); O(11,7,55,'soda');
+  // balcão em U (2x2) + atendente fica ao norte da abertura
+  O(13,7,16,null); O(14,7,17,null); O(13,8,18,null); O(14,8,19,null);
+  // overlays suspensos (sem colisão)
+  O(8,1,30,null,{overlay:true}); O(13,1,31,null,{overlay:true});
+  O(2,3,40,null,{overlay:true}); O(6,3,41,null,{overlay:true}); O(12,3,43,null,{overlay:true});
+  // colisões
+  ARC.solid=new Set();
+  for(let x=0;x<W;x++)ARC.solid.add(akey(x,0));              // parede topo
+  for(const o of ARC.objs)if(o.solid)ARC.solid.add(akey(o.x,o.y));
+  ARC.built=true;
+}
+function arcSolid(px,py){
+  if(px<0.35||py<1.0||px>ARC.W-0.35||py>ARC.H-0.1)return true;
+  if(ARC.solid.has(akey(Math.floor(px),Math.floor(py))))return true;
+  return false;
+}
+function arcDist(ax,ay){return Math.hypot(ax-player.x,ay-player.y)}
+function nearestArcInteract(){
+  // saída primeiro se estiver bem perto da porta
+  if(arcDist(ARC.exit.x,ARC.exit.y)<1.1)return {type:'exit'};
+  if(arcDist(ARC.npc.x,ARC.npc.y)<1.3)return {type:'attendant'};
+  let best=null,bd=1.35;
+  for(const o of ARC.objs){if(!o.type)continue;const d=arcDist(o.x+0.5,o.y+0.7);if(d<bd){bd=d;best=o}}
+  return best?{type:best.type,obj:best}:null;
+}
+function arcPromptText(t){return {
+  arcade:'Jogar fliperama — E/A (1 ficha)',attendant:'Comprar fichas — E/A 🎟️',
+  popcorn:'Pegar pipoca grátis — E/A 🍿',soda:'Pegar refrigerante grátis — E/A 🥤',
+  cake:'Comer bolo do Nolan — E/A 🎂',prizes:'Trocar tickets por prêmios — E/A 🎁',
+  game:'Jogar — E/A 🎱',exit:'Sair do Go Games — E/A 🚪'}[t]||''}
+function doArcInteract(it){
+  if(it.type==='exit'){exitArcade();return}
+  if(it.type==='attendant'){openShopDef(SHOPS.arcadeCounter);return}
+  if(it.type==='arcade'){
+    if(fichas<=0){showToast('Sem fichas! Pegue com o Zé no balcão 🎟️');return}
+    fichas--;const won=2+Math.floor(Math.random()*9);tickets+=won;
+    const g=['Pac-Mons','Tiro Espacial','Corrida Turbo','Luta Neon','Pinball'][Math.floor(Math.random()*5)];
+    showToast('Jogou '+g+'! 🕹️ +'+won+' tickets');updateArcadeHud();return;
+  }
+  if(it.type==='game'){tickets+=1;showToast('Partida divertida! 🎱 +1 ticket');updateArcadeHud();return}
+  if(it.type==='popcorn'){const h=player.hp>=100;if(h){showToast('Você está cheio! 🍿');return}player.hp=Math.min(100,player.hp+20);updateHUD();showToast('Pipoca quentinha! 🍿 +20');return}
+  if(it.type==='soda'){const h=player.hp>=100;if(h){showToast('Você está cheio! 🥤');return}player.hp=Math.min(100,player.hp+15);updateHUD();showToast('Refrigerante gelado! 🥤 +15');return}
+  if(it.type==='cake'){player.hp=Math.min(100,player.hp+30);updateHUD();showToast('Bolo do Nolan! 🎂 Parabéns! +30');return}
+  if(it.type==='prizes'){showToast(tickets>0?('Você tem '+tickets+' tickets! 🎁 Junte mais pra trocar por prêmios.'):'Jogue os fliperamas e junte tickets! 🎁');return}
+}
+function updateArcadeHud(){const el=document.getElementById('arcadeHud');if(el)el.textContent='🎟️ Fichas: '+fichas+'   🎫 Tickets: '+tickets}
+function toggleCityHud(show){['minimap','mission','radio'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=show?'':'none'})}
+function enterArcade(){
+  if(!ARC.built)buildArcade();
+  cityReturn={x:player.x,y:player.y};
+  scene='arcade';player.inCar=null;
+  player.x=ARC.spawn.x;player.y=ARC.spawn.y;player.dir='up';player.anim=0;
+  toggleCityHud(false);
+  document.getElementById('arcadeHud').classList.remove('hidden');
+  updateArcadeHud();updateHUD();
+  const first=currentQuest()&&currentQuest().event==='party';
+  questEvent('party');
+  if(first)openPartySplash();
+}
+function exitArcade(){
+  scene='city';
+  document.getElementById('arcadeHud').classList.add('hidden');
+  document.getElementById('prompt').style.display='none';
+  toggleCityHud(true);
+  if(cityReturn){player.x=cityReturn.x;player.y=cityReturn.y+0.25}
+  player.dir='down';updateHUD();showToast('Você saiu do Go Games 🚪');
+}
+function updateArcade(dt){
+  if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)document.getElementById('toast').style.display='none'}
+  const actionDown=Keys.KeyE||touch.a;
+  const blocked=shopOpen||menuOpen||partyOpen;
+  let dx=0,dy=0;
+  if(!blocked){
+    if(Keys.KeyW||Keys.ArrowUp)dy-=1;if(Keys.KeyS||Keys.ArrowDown)dy+=1;if(Keys.KeyA||Keys.ArrowLeft)dx-=1;if(Keys.KeyD||Keys.ArrowRight)dx+=1;
+    if(touch.active){dx+=touch.x;dy+=touch.y}
+  }
+  const len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;
+  if(!blocked&&(dx||dy)){
+    if(Math.abs(dx)>Math.abs(dy))player.dir=dx>0?'right':'left';else player.dir=dy>0?'down':'up';
+    const sp=(Keys.ShiftLeft||touch.xbtn)?player.speed*1.4:player.speed;
+    const nx=player.x+dx*sp*dt,ny=player.y+dy*sp*dt;
+    if(!arcSolid(nx,player.y))player.x=nx;
+    if(!arcSolid(player.x,ny))player.y=ny;
+    player.anim+=dt*8;
+  }
+  let it=blocked?null:nearestArcInteract();
+  const pEl=document.getElementById('prompt');
+  if(it){pEl.textContent=arcPromptText(it.type);pEl.style.display='block'}else pEl.style.display='none';
+  if(actionDown&&!player._e&&!blocked&&it)doArcInteract(it);
+  player._e=actionDown;
+  updateButtonStates();
+}
+function drawArcade(){
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#140e26';ctx.fillRect(0,0,W,H);
+  const ox=Math.floor((W-ARC.W*TILE)/2),oy=Math.floor((H-ARC.H*TILE)/2);ARC.ox=ox;ARC.oy=oy;
+  for(let y=0;y<ARC.H;y++)for(let x=0;x<ARC.W;x++)drawSheet(arcTile(ARC.floor[y][x]),ox+x*TILE,oy+y*TILE);
+  // tapete de saída
+  ctx.fillStyle='#1b8cff';ctx.fillRect(ox+ARC.exit.x*TILE-30,oy+(ARC.H-1)*TILE+18,60,40);
+  ctx.fillStyle='#fff';ctx.font='900 11px Arial';ctx.textAlign='center';ctx.fillText('SAÍDA',ox+ARC.exit.x*TILE,oy+(ARC.H-1)*TILE+42);
+  const draws=[];
+  for(const o of ARC.objs){if(o.overlay)continue;draws.push({y:o.y,fn:()=>drawSheet(arcTile(o.idx),ox+o.x*TILE,oy+o.y*TILE)})}
+  draws.push({y:ARC.npc.y,fn:()=>drawSheet(sheet(ASSETS.people[ARC.npc.kind],dirRow(ARC.npc.dir),0),ox+ARC.npc.x*TILE-TILE/2,oy+ARC.npc.y*TILE-TILE/2)});
+  const col=Math.floor(player.anim)%4;
+  draws.push({y:player.y,fn:()=>drawSheet(sheet(ASSETS.people[activeChar().kind],dirRow(player.dir),col),ox+player.x*TILE-TILE/2,oy+player.y*TILE-TILE/2)});
+  draws.sort((a,b)=>a.y-b.y);draws.forEach(d=>d.fn());
+  for(const o of ARC.objs)if(o.overlay)drawSheet(arcTile(o.idx),ox+o.x*TILE,oy+o.y*TILE);
+  updateButtonStates();
+}
 
 // ===== Party =====
 function switchMember(i){
@@ -1043,7 +1188,7 @@ function update(dt){
     promptEl.textContent=npc?'Conversar — E ou botão A (toque)':venue?'Entrar na festa do Nolan — E ou botão A 🎂':shop?('Entrar — E ou botão A — '+SHOPS[shop.name].title):'Entrar no carro — E ou botão A (toque)';
     if(actionDown&&!player._e&&!actionConsumed){
       if(npc)openNpcDialog(npc);
-      else if(venue)openParty();
+      else if(venue)enterArcade();
       else if(shop)openShop(shop);
       else if(car){
         const roubo=!car.parked; // carro em patrulha = roubo; carro que voce estacionou ou seu carro = sem punicao
@@ -1241,7 +1386,7 @@ function drawMinimap(){
   mctx.fillStyle='#ffd23c';mctx.fillRect(38*sx,18*sy,5,5);
   mctx.fillStyle='#42e8ff';mctx.beginPath();mctx.arc(player.x*sx,player.y*sy,4,0,7);mctx.fill();
 }
-function loop(t){if(!running)return;const dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);draw();requestAnimationFrame(loop)}
+function loop(t){if(!running)return;const dt=Math.min(.033,(t-last)/1000||0);last=t;if(scene==='arcade'){updateArcade(dt);drawArcade()}else{update(dt);draw()}requestAnimationFrame(loop)}
 
 document.getElementById('dialogBox').addEventListener('click',advanceDialog);
 canvas.addEventListener('click',e=>{

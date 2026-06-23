@@ -14,18 +14,24 @@
   "sources": [
     "assets\\imagegen\\tilesets\\tileset - arcade\\diftexb-558648e2-1f27-424c-8939-0ffb3dbb6b37.png",
     "assets\\imagegen\\tilesets\\tileset - arcade\\di592ye-36f28ac7-13a5-461d-b1b5-b7026ee357bb.png",
+    "assets\\imagegen\\tilesets\\tileset - arcade\\arcade_interior_expansion.png",
+    "assets\\imagegen\\tilesets\\tileset - arcade\\cinema_concessions_expansion.png",
     "assets\\imagegen\\tilesets\\shops\\shop_arcade_interior_tileset.png"
   ],
   "rules": [
-    "Terrain cells are edge-to-edge and walkable unless noted otherwise.",
+    "Indices 0 through 7 are orange edge-to-edge walkable floor tiles.",
+    "Indices 56 through 63 are the dark room floor and wall variants.",
     "Arcade machines and counters are bottom-center anchored solid objects.",
-    "Counters form a modular horizontal service line; the register cell is the interaction point.",
+    "The U-shaped counter is a fixed 2x2 module: 16-17 on top and 18-19 on the bottom.",
+    "The source counter opens to the north; do not separate or rotate its quadrants independently.",
     "Birthday garlands, ceiling balloons, and loose balloons are overlays and do not block movement.",
     "The birthday cake table, game tables, cabinets, counters, and gift cluster have colliders.",
+    "The popcorn machine, soda machine, ticket booth, concession tables, and refrigerator are solid interaction objects.",
+    "Loose popcorn and drinks must never be placed on terrain; use composite table tiles 48 and 49.",
     "Place at least one walkable tile in front of every arcade machine and counter interaction point."
   ],
   "entries": {
-    "floor_neon_a": {
+    "orange_floor_a": {
       "index": 0,
       "row": 0,
       "column": 0,
@@ -33,7 +39,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "floor_neon_b": {
+    "orange_floor_b": {
       "index": 1,
       "row": 0,
       "column": 1,
@@ -41,7 +47,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "floor_neon_c": {
+    "orange_floor_c": {
       "index": 2,
       "row": 0,
       "column": 2,
@@ -49,7 +55,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "wall_neon": {
+    "orange_floor_d": {
       "index": 3,
       "row": 0,
       "column": 3,
@@ -57,7 +63,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "party_carpet_a": {
+    "orange_floor_e": {
       "index": 4,
       "row": 0,
       "column": 4,
@@ -65,7 +71,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "party_carpet_b": {
+    "orange_floor_f": {
       "index": 5,
       "row": 0,
       "column": 5,
@@ -73,7 +79,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "floor_mirrored": {
+    "orange_floor_g": {
       "index": 6,
       "row": 0,
       "column": 6,
@@ -81,7 +87,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "floor_shadow": {
+    "orange_floor_h": {
       "index": 7,
       "row": 0,
       "column": 7,
@@ -129,7 +135,7 @@
       "collision": "solid",
       "anchor": "bottom-center"
     },
-    "arcade_cabinet_bonus_1": {
+    "arcade_cabinet_6": {
       "index": 13,
       "row": 1,
       "column": 5,
@@ -137,7 +143,7 @@
       "collision": "solid",
       "anchor": "bottom-center"
     },
-    "arcade_cabinet_bonus_2": {
+    "arcade_cabinet_7": {
       "index": 14,
       "row": 1,
       "column": 6,
@@ -145,7 +151,7 @@
       "collision": "solid",
       "anchor": "bottom-center"
     },
-    "arcade_cabinet_bonus_3": {
+    "arcade_cabinet_8": {
       "index": 15,
       "row": 1,
       "column": 7,
@@ -153,45 +159,45 @@
       "collision": "solid",
       "anchor": "bottom-center"
     },
-    "counter_left": {
+    "u_counter_top_left": {
       "index": 16,
       "row": 2,
       "column": 0,
       "category": "counter",
-      "collision": "solid",
+      "collision": "solid-interaction",
       "anchor": "tile"
     },
-    "counter_middle": {
+    "u_counter_top_right": {
       "index": 17,
       "row": 2,
       "column": 1,
       "category": "counter",
-      "collision": "solid",
+      "collision": "solid-interaction",
       "anchor": "tile"
     },
-    "counter_right": {
+    "u_counter_bottom_left": {
       "index": 18,
       "row": 2,
       "column": 2,
       "category": "counter",
-      "collision": "solid",
+      "collision": "solid-interaction",
       "anchor": "tile"
     },
-    "counter_corner": {
+    "u_counter_bottom_right": {
       "index": 19,
       "row": 2,
       "column": 3,
       "category": "counter",
-      "collision": "solid",
+      "collision": "solid-interaction",
       "anchor": "tile"
     },
-    "counter_register": {
+    "arcade_lounge_seat": {
       "index": 20,
       "row": 2,
       "column": 4,
-      "category": "counter",
-      "collision": "solid-interaction",
-      "anchor": "tile"
+      "category": "furniture",
+      "collision": "solid",
+      "anchor": "bottom-center"
     },
     "prize_terminal": {
       "index": 21,
@@ -385,7 +391,95 @@
       "collision": "overlay-no-collision",
       "anchor": "top-center"
     },
-    "editor_floor_copy_1": {
+    "ticket_booth": {
+      "index": 45,
+      "row": 5,
+      "column": 5,
+      "category": "service",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "popcorn_machine": {
+      "index": 46,
+      "row": 5,
+      "column": 6,
+      "category": "concessions",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "soda_machine": {
+      "index": 47,
+      "row": 5,
+      "column": 7,
+      "category": "concessions",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "popcorn_table_red": {
+      "index": 48,
+      "row": 6,
+      "column": 0,
+      "category": "concessions",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "drinks_table_yellow": {
+      "index": 49,
+      "row": 6,
+      "column": 1,
+      "category": "concessions",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "cinema_seat_cluster": {
+      "index": 50,
+      "row": 6,
+      "column": 2,
+      "category": "furniture",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "concession_table_red": {
+      "index": 51,
+      "row": 6,
+      "column": 3,
+      "category": "furniture",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "concession_table_yellow": {
+      "index": 52,
+      "row": 6,
+      "column": 4,
+      "category": "furniture",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "lounge_sofa_red": {
+      "index": 53,
+      "row": 6,
+      "column": 5,
+      "category": "furniture",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "wall_drink_shelf": {
+      "index": 54,
+      "row": 6,
+      "column": 6,
+      "category": "concessions",
+      "collision": "solid",
+      "anchor": "bottom-center"
+    },
+    "mini_refrigerator": {
+      "index": 55,
+      "row": 6,
+      "column": 7,
+      "category": "concessions",
+      "collision": "solid-interaction",
+      "anchor": "bottom-center"
+    },
+    "dark_floor_a": {
       "index": 56,
       "row": 7,
       "column": 0,
@@ -393,7 +487,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "editor_floor_copy_2": {
+    "dark_floor_b": {
       "index": 57,
       "row": 7,
       "column": 1,
@@ -401,7 +495,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "editor_floor_copy_3": {
+    "dark_floor_c": {
       "index": 58,
       "row": 7,
       "column": 2,
@@ -409,15 +503,15 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "editor_floor_copy_4": {
+    "wall_neon": {
       "index": 59,
       "row": 7,
       "column": 3,
       "category": "terrain",
-      "collision": "walkable",
+      "collision": "solid",
       "anchor": "tile"
     },
-    "editor_floor_copy_5": {
+    "dark_floor_mirrored": {
       "index": 60,
       "row": 7,
       "column": 4,
@@ -425,7 +519,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "editor_floor_copy_6": {
+    "dark_floor_shadow": {
       "index": 61,
       "row": 7,
       "column": 5,
@@ -433,7 +527,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "editor_floor_copy_7": {
+    "dark_floor_edge": {
       "index": 62,
       "row": 7,
       "column": 6,
@@ -441,7 +535,7 @@
       "collision": "walkable",
       "anchor": "tile"
     },
-    "editor_floor_copy_8": {
+    "dark_floor_dim": {
       "index": 63,
       "row": 7,
       "column": 7,
